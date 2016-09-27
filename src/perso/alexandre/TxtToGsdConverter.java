@@ -6,14 +6,22 @@ import java.io.IOException;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.implementations.SingleGraph;
 
 public class TxtToGsdConverter {
 
 	public static void main(String args[]) throws IOException{
-		Graph graph = new MultiGraph("test");
-
-        String basicFile = "data/norma_N5_tau4_dt2_delai820_000001.txt";
+		//Si on finit assez vite la partie algo, 
+		//faire une interface qui propose de choisir un fichier texte
+		// (Youri travaille dessus normalement)
+		for(int i = 0; i < 10; i++){
+			txtToGsd("data/","norma_N5_tau4_dt2_delai820_00000"+i);
+		}
+	}
+	public static void txtToGsd(String path, String filename) throws IOException{
+		Graph graph = new SingleGraph("test");
+		
+        String basicFile = path+filename+".txt";
         String line = "";
         String cvsSplitBy = "   ";
 
@@ -35,8 +43,6 @@ public class TxtToGsdConverter {
             e.printStackTrace();
         }
         
-        graph.display(false);
-        graph.write(basicFile+".dgs");
+        graph.write("dgs/"+filename+".dgs");
 	}
-
 }

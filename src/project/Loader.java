@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.implementations.SingleGraph;
 
 public class Loader {
 	private String filePath;
@@ -16,7 +16,7 @@ public class Loader {
 	}
 	
 	public Graph loadGraph(String id){
-		Graph graph = new MultiGraph(id);
+		Graph graph = new SingleGraph(id);
 
         String basicFile = filePath;
         String line = "";

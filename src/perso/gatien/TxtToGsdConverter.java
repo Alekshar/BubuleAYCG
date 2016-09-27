@@ -1,4 +1,4 @@
-package gatien;
+package perso.gatien;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

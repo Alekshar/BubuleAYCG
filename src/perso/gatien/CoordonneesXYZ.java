@@ -1,4 +1,4 @@
-package gatien;
+package perso.gatien;
 
 public class CoordonneesXYZ {
 	private double x;

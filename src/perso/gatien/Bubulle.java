@@ -1,4 +1,4 @@
-package gatien;
+package perso.gatien;
 
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;

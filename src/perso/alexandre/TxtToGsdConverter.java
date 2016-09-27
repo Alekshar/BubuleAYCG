@@ -1,4 +1,4 @@
-package tests.alexandre;
+package perso.alexandre;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

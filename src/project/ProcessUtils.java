@@ -10,7 +10,13 @@ public final class ProcessUtils {
 		// means only static methods
 	}
 
-	public static Graph fillEdges(Graph graph, double distanceLimit) {
+	/**
+	 * generates edges in the graph between every node with a distance lesser than distanceLimit
+	 * @param graph
+	 * @param distanceLimit 
+	 * @return graph instance
+	 */
+	public static Graph generateEdges(Graph graph, double distanceLimit) {
 		for (Node p1 : graph) {
 			Point3D cP1 = new Point3D(p1);
 			for (Node p2 : graph) {

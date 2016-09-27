@@ -84,6 +84,8 @@ public class Bubulle {
 		return Math.sqrt( Math.pow(c1.getX()-c0.getX(),2)+Math.pow(c1.getY()-c0.getY(),2)+Math.pow(c1.getZ()-c0.getZ(),2));
 	}
 	
-	//public static boolean verificationDistance(CoordonneesXYZ c1, CoordonneesXYZ c2, CoordonneesXYZ c3, double margeErreur){
+	public static boolean verificationDistance(CoordonneesXYZ c1, CoordonneesXYZ c2, CoordonneesXYZ c3, double margeErreur){
+		return false;	
+	}
 	
 }

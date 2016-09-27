@@ -5,7 +5,7 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
-public class bubulle {
+public class Bubulle {
 
 	public static void main(String[] args) {
 		Graph bulles = new SingleGraph("Bulles");

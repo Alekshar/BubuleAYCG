@@ -1,16 +1,27 @@
 package perso.gatien;
 
+import org.graphstream.graph.Node;
+
 public class Point3D {
 	private double x;
 	private double y;
 	private double z;
 	
+	public Point3D(Node node){
+		Object[] locationAttribute = node.getAttribute("xyz");
+		affect((Double) locationAttribute[0], (Double) locationAttribute[1], (Double) locationAttribute[2]);
+	}
+
 	public Point3D(double x, double y, double z){
+		affect(x, y, z);
+	}
+
+	private final void affect(double x, double y, double z){
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	public double getX(){
 		return x;
 	}

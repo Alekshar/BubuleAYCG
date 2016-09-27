@@ -1,9 +1,11 @@
 package project;
 
+import javax.vecmath.Vector3d;
+
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 
-import perso.gatien.Point3D;
+import project.Point3D;
 
 public final class ProcessUtils {
 	private ProcessUtils() {
@@ -34,4 +36,16 @@ public final class ProcessUtils {
 		return graph;
 	}
 
+	public static double getAngle(Point3D a, Point3D b, Point3D c){
+		Vector3d ab = a.getVectorTo(b);
+		Vector3d bc = b.getVectorTo(c);
+		double radian = ab.angle(bc);
+		double angle = Math.toDegrees(radian);
+		return angle;
+	}
+
+	public static boolean checkAngle(Point3D a, Point3D b, Point3D c, double toleratedAngle){
+		return getAngle(a, b, c) < toleratedAngle;
+	}
+	
 }

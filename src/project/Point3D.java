@@ -1,4 +1,6 @@
-package perso.gatien;
+package project;
+
+import javax.vecmath.Vector3d;
 
 import org.graphstream.graph.Node;
 
@@ -56,9 +58,25 @@ public class Point3D {
 		}
 		return false;	
 	}
+
+	public boolean verificationDistanceV2(Point3D pB, Point3D pC, double margeErreur){
+		return this.verificationDistanceV2(pB, pC, margeErreur, false);
+	}
+	
+	public boolean verificationDistanceV2(Point3D pB, Point3D pC, double margeErreur, boolean distanceDouble){
+		int ratio = distanceDouble ? 2 : 1;
+		if(Math.abs(this.distance(pB)*ratio-pB.distance(pC))< seuilErreur(this.distance(pB), margeErreur)){
+			return true;
+		}
+		return false;	
+	}
 	
 	public static double seuilErreur(double nb, double margeErreur){
 		return nb*margeErreur;
+	}
+
+	public Vector3d getVectorTo(Point3D other) {
+		return new Vector3d(other.getX()-this.getX(), other.getY()-this.getY(), other.getZ()-this.getZ());
 	}
 	
 	public static void main(String[] args) {
@@ -68,6 +86,7 @@ public class Point3D {
 		Point3D p4 = new Point3D(4,0,0);
 		Point3D p5 = new Point3D(5,0,0);
 		Point3D p6 = new Point3D(1,1,1);
+		Point3D p7 = new Point3D(5,2,3);
 		
 		System.out.println(p1.distance(p2));
 		System.out.println(p1.distance(p4));
@@ -78,6 +97,10 @@ public class Point3D {
 		System.out.println(p2.verificationDistance(p3, p4, 0.1));
 		System.out.println(p2.verificationDistance(true, p3, p4, 0.1));
 		System.out.println(p1.verificationDistance(true, p2, p3, 0.1));
+		
+		
+		System.out.println(ProcessUtils.getAngle(p2, p6, p7));
 	}
+
 }
 

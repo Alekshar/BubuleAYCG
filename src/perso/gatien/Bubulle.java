@@ -20,19 +20,19 @@ public class Bubulle {
 		double seuilDistance = moyenneDesDistance(bulles)*20/100;
 		
 		//Création des arrêtes
-		for(Node p1:bulles){
-			Object[] attrP1 = p1.getAttribute("xyz");
-			CoordonneesXYZ cP1 = new CoordonneesXYZ((Double)attrP1[0], (Double)attrP1[1], (Double)attrP1[2]);
+		for(Node n1:bulles){
+			Object[] attrN1 = n1.getAttribute("xyz");
+			Point3D p1 = new Point3D((Double)attrN1[0], (Double)attrN1[1], (Double)attrN1[2]);
 			
-			for(Node p2:bulles){
-				Object[] attrP2 = p2.getAttribute("xyz");
-				CoordonneesXYZ cP2 = new CoordonneesXYZ((Double)attrP2[0], (Double)attrP2[1], (Double)attrP2[2]);
+			for(Node n2:bulles){
+				Object[] attrN2 = n2.getAttribute("xyz");
+				Point3D p2 = new Point3D((Double)attrN2[0], (Double)attrN2[1], (Double)attrN2[2]);
 				
-				double distanceP1P2 = distanceXYZ(cP1,cP2);
+				double distanceP1P2 = p1.distance(p2);
 				
 				if(distanceP1P2 < seuilDistance){
 					try{
-						bulles.addEdge(p1.getId()+p2.getId(), p1, p2);
+						bulles.addEdge(n1.getId()+n2.getId(), n1, n2);
 					}catch(Exception e){
 						//L'arrête existe déjà
 					}
@@ -43,18 +43,18 @@ public class Bubulle {
 		bulles.display(false);
 		
 		//Algo
-		for(Node p1:bulles){
-			Object[] attrP1 = p1.getAttribute("xyz");
-			CoordonneesXYZ cP1 = new CoordonneesXYZ((Double)attrP1[0], (Double)attrP1[1], (Double)attrP1[2]);
-			for(Edge e1:p1){
-				Node p2 = e1.getOpposite(p1);
-				Object[] attrP2 = p2.getAttribute("xyz");
-				CoordonneesXYZ cP2 = new CoordonneesXYZ((Double)attrP2[0], (Double)attrP2[1], (Double)attrP2[2]);
+		for(Node n1:bulles){
+			Object[] attrN1 = n1.getAttribute("xyz");
+			Point3D p1 = new Point3D((Double)attrN1[0], (Double)attrN1[1], (Double)attrN1[2]);
+			for(Edge e1:n1){
+				Node n2 = e1.getOpposite(n1);
+				Object[] attrN2 = n2.getAttribute("xyz");
+				Point3D p2 = new Point3D((Double)attrN2[0], (Double)attrN2[1], (Double)attrN2[2]);
 				
-				for(Edge e2:p2){
-					Node p3 = e2.getOpposite(p2);
-					Object[] attrP3 = p2.getAttribute("xyz");
-					CoordonneesXYZ cP3 = new CoordonneesXYZ((Double)attrP3[0], (Double)attrP3[1], (Double)attrP3[2]);
+				for(Edge e2:n2){
+					Node n3 = e2.getOpposite(n2);
+					Object[] attrN3 = n2.getAttribute("xyz");
+					Point3D p3 = new Point3D((Double)attrN3[0], (Double)attrN3[1], (Double)attrN3[2]);
 					//if()
 				}
 			}
@@ -65,26 +65,22 @@ public class Bubulle {
 		
 		double cpt =0.0;
 		double sommeDistance=0.0;
-		for(Node p0:graph){
-			Object[] attributesP0 = p0.getAttribute("xyz");
-			CoordonneesXYZ cP0 = new CoordonneesXYZ((Double)attributesP0[0], (Double)attributesP0[1], (Double)attributesP0[2]);
+		for(Node n0:graph){
+			Object[] attrN0 = n0.getAttribute("xyz");
+			Point3D pA = new Point3D((Double)attrN0[0], (Double)attrN0[1], (Double)attrN0[2]);
 
-			for(Node p1:graph){
-				Object[] attributesP1 = p1.getAttribute("xyz");
-				CoordonneesXYZ cP1 = new CoordonneesXYZ((Double)attributesP1[0], (Double)attributesP1[1], (Double)attributesP1[2]);
+			for(Node n1:graph){
+				Object[] attrN1 = n1.getAttribute("xyz");
+				Point3D pB = new Point3D((Double)attrN1[0], (Double)attrN1[1], (Double)attrN1[2]);
 				
-				sommeDistance += distanceXYZ(cP0,cP1);
+				sommeDistance += pA.distance(pB);
 				cpt++;
 			}
 		}
 		return sommeDistance/cpt;
 	}
 	
-	public static double distanceXYZ(CoordonneesXYZ c0, CoordonneesXYZ c1){
-		return Math.sqrt( Math.pow(c1.getX()-c0.getX(),2)+Math.pow(c1.getY()-c0.getY(),2)+Math.pow(c1.getZ()-c0.getZ(),2));
-	}
-	
-	public static boolean verificationDistance(CoordonneesXYZ c1, CoordonneesXYZ c2, CoordonneesXYZ c3, double margeErreur){
+	public static boolean verificationDistance(Point3D c1, Point3D c2, Point3D c3, double margeErreur){
 		return false;	
 	}
 	

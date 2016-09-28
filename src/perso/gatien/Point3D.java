@@ -36,34 +36,19 @@ public class Point3D {
 		return z;
 	}
 	
+	public String toString(){
+		return "("+this.x+" ; "+this.y+" ; "+this.z+")";
+	}
+	
 	public double distance(Point3D c1){
 		return Math.sqrt( Math.pow(c1.getX()-this.getX(),2)+Math.pow(c1.getY()-this.getY(),2)+Math.pow(c1.getZ()-this.getZ(),2));
 	}
-	
-	//Marge d'erreur est un chiffre, 0.1 => 10%
-	public boolean verificationDistance(Point3D pB, Point3D pC, double margeErreur){
-		if(Math.abs(this.distance(pB)-pB.distance(pC))<= seuilErreur(this.distance(pB), margeErreur)){
-			return true;
-		}
-		return false;	
-	}
-	//La distance double est celle entre les points en paramètre
-	public boolean verificationDistance(boolean distanceDouble,Point3D pB, Point3D pC, double margeErreur){
-		if(!distanceDouble){
-			verificationDistance(pB, pC, margeErreur);
-		}else{
-			if(Math.abs(this.distance(pB)*2-pB.distance(pC))< seuilErreur(this.distance(pB), margeErreur)){
-				return true;
-			}
-		}
-		return false;	
-	}
 
-	public boolean verificationDistanceV2(Point3D pB, Point3D pC, double margeErreur){
-		return this.verificationDistanceV2(pB, pC, margeErreur, false);
+	public boolean verificationDistance(Point3D pB, Point3D pC, double margeErreur){
+		return this.verificationDistance(pB, pC, margeErreur, false);
 	}
 	
-	public boolean verificationDistanceV2(Point3D pB, Point3D pC, double margeErreur, boolean distanceDouble){
+	public boolean verificationDistance(Point3D pB, Point3D pC, double margeErreur, boolean distanceDouble){
 		int ratio = distanceDouble ? 2 : 1;
 		if(Math.abs(this.distance(pB)*ratio-pB.distance(pC))< seuilErreur(this.distance(pB), margeErreur)){
 			return true;
@@ -95,8 +80,8 @@ public class Point3D {
 		System.out.println(p1.verificationDistance(p2, p3, 0.1));
 		System.out.println(p1.verificationDistance(p2, p4, 0.1));
 		System.out.println(p2.verificationDistance(p3, p4, 0.1));
-		System.out.println(p2.verificationDistance(true, p3, p4, 0.1));
-		System.out.println(p1.verificationDistance(true, p2, p3, 0.1));
+		System.out.println(p2.verificationDistance(p3, p4, 0.1,true));
+		System.out.println(p1.verificationDistance(p2, p3, 0.1,true));
 		
 		
 		System.out.println(ProcessUtils.getAngle(p2, p6, p7));

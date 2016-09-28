@@ -11,7 +11,7 @@ public class Bubulle {
 		Graph bulles = new SingleGraph("Bulles");
 		
 		try{
-			bulles.read("norma_N5_tau4_dt2_delai820_000000.dgs");
+			bulles.read("dgs/norma_N5_tau4_dt2_delai820_000000.dgs");
 		}
 		catch(Exception e){
 			System.out.print("erreur");
@@ -20,28 +20,9 @@ public class Bubulle {
 		double seuilDistance = moyenneDesDistance(bulles)*20/100;
 		
 		//Création des arrêtes
-		for(Node n1:bulles){
-			Object[] attrN1 = n1.getAttribute("xyz");
-			Point3D p1 = new Point3D((Double)attrN1[0], (Double)attrN1[1], (Double)attrN1[2]);
-			
-			for(Node n2:bulles){
-				Object[] attrN2 = n2.getAttribute("xyz");
-				Point3D p2 = new Point3D((Double)attrN2[0], (Double)attrN2[1], (Double)attrN2[2]);
-				
-				double distanceP1P2 = p1.distance(p2);
-				
-				if(distanceP1P2 < seuilDistance){
-					try{
-						bulles.addEdge(n1.getId()+n2.getId(), n1, n2);
-					}catch(Exception e){
-						//L'arrête existe déjà
-					}
-					
-				}
-			}
-		}
-		bulles.display(false);
-		
+		bulles = ProcessUtils.generateEdges(bulles, seuilDistance);
+
+		int cpt =0;
 		//Algo
 		for(Node n1:bulles){
 			Point3D p1 = new Point3D(n1);
@@ -51,13 +32,22 @@ public class Bubulle {
 				
 				for(Edge e2:n2){
 					Node n3 = e2.getOpposite(n2);
-					Point3D p3 = new Point3D(n3);
-					if(verificationDistance(p1, p2, p3, 0.1)){
+					//On test si le voisin de n2 n'est pas tout simplement n1
+					if(n3.getId()!=n1.getId()){
+						Point3D p3 = new Point3D(n3);
+						
+						//rajouter la vérification d'angle
+						if(p1.verificationDistance( p2, p3, 0.1)){
+							cpt++;
+						}
+					}else{
 						
 					}
+					
 				}
 			}
 		}
+		System.out.println(cpt);
 	}
 	
 	public static double moyenneDesDistance(Graph graph){

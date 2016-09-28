@@ -40,41 +40,31 @@ public class Point3D {
 		return Math.sqrt( Math.pow(c1.getX()-this.getX(),2)+Math.pow(c1.getY()-this.getY(),2)+Math.pow(c1.getZ()-this.getZ(),2));
 	}
 	
-	//Marge d'erreur est un chiffre, 0.1 => 10%
-	public boolean verificationDistance(Point3D pB, Point3D pC, double margeErreur){
-		if(Math.abs(this.distance(pB)-pB.distance(pC))<= seuilErreur(this.distance(pB), margeErreur)){
-			return true;
-		}
-		return false;	
-	}
-	//La distance double est celle entre les points en paramètre
-	public boolean verificationDistance(boolean distanceDouble,Point3D pB, Point3D pC, double margeErreur){
-		if(!distanceDouble){
-			verificationDistance(pB, pC, margeErreur);
-		}else{
-			if(Math.abs(this.distance(pB)*2-pB.distance(pC))< seuilErreur(this.distance(pB), margeErreur)){
-				return true;
-			}
-		}
-		return false;	
-	}
-
-	public boolean verificationDistanceV2(Point3D pB, Point3D pC, double margeErreur){
-		return this.verificationDistanceV2(pB, pC, margeErreur, false);
+	/**
+	 * Checks if distance between this and p1 is same as between p1 and p2
+	 * @param toleratedRatio percentage in double : 10% -> 0.1
+	 */
+	public boolean verificationDistance(Point3D p1, Point3D p2, double toleratedRatio){
+		return this.verificationDistance(p1, p2, toleratedRatio, 1);
 	}
 	
-	public boolean verificationDistanceV2(Point3D pB, Point3D pC, double margeErreur, boolean distanceDouble){
-		int ratio = distanceDouble ? 2 : 1;
-		if(Math.abs(this.distance(pB)*ratio-pB.distance(pC))< seuilErreur(this.distance(pB), margeErreur)){
+	/**
+	 * Checks if distance between this and p1 is same order as between p1 and p2
+	 * @param toleratedRatio percentage in double : 10% -> 0.1
+	 * @param distanceRatio number of distance units between p1 and p2 (unit is distance between this an p1)
+	 */
+	public boolean verificationDistance(Point3D p1, Point3D p2, double toleratedRatio, int distanceRatio){
+		double distanceDiff = Math.abs(this.distance(p1)*distanceRatio-p1.distance(p2));
+		double errorLimit = this.distance(p1)*toleratedRatio;
+		if(distanceDiff < errorLimit){
 			return true;
 		}
 		return false;	
 	}
 	
-	public static double seuilErreur(double nb, double margeErreur){
-		return nb*margeErreur;
-	}
-
+	/**
+	 * @return vector from this to other point 
+	 */
 	public Vector3d getVectorTo(Point3D other) {
 		return new Vector3d(other.getX()-this.getX(), other.getY()-this.getY(), other.getZ()-this.getZ());
 	}
@@ -84,7 +74,6 @@ public class Point3D {
 		Point3D p2 = new Point3D(1,0,0);
 		Point3D p3 = new Point3D(2,0,0);
 		Point3D p4 = new Point3D(4,0,0);
-		Point3D p5 = new Point3D(5,0,0);
 		Point3D p6 = new Point3D(1,1,1);
 		Point3D p7 = new Point3D(5,2,3);
 		
@@ -95,9 +84,8 @@ public class Point3D {
 		System.out.println(p1.verificationDistance(p2, p3, 0.1));
 		System.out.println(p1.verificationDistance(p2, p4, 0.1));
 		System.out.println(p2.verificationDistance(p3, p4, 0.1));
-		System.out.println(p2.verificationDistance(true, p3, p4, 0.1));
-		System.out.println(p1.verificationDistance(true, p2, p3, 0.1));
-		
+		System.out.println(p2.verificationDistance(p3, p4, 0.1, 2));
+		System.out.println(p1.verificationDistance(p2, p3, 0.1, 2));
 		
 		System.out.println(ProcessUtils.getAngle(p2, p6, p7));
 	}

@@ -44,18 +44,17 @@ public class Bubulle {
 		
 		//Algo
 		for(Node n1:bulles){
-			Object[] attrN1 = n1.getAttribute("xyz");
-			Point3D p1 = new Point3D((Double)attrN1[0], (Double)attrN1[1], (Double)attrN1[2]);
+			Point3D p1 = new Point3D(n1);
 			for(Edge e1:n1){
 				Node n2 = e1.getOpposite(n1);
-				Object[] attrN2 = n2.getAttribute("xyz");
-				Point3D p2 = new Point3D((Double)attrN2[0], (Double)attrN2[1], (Double)attrN2[2]);
+				Point3D p2 = new Point3D(n2);
 				
 				for(Edge e2:n2){
 					Node n3 = e2.getOpposite(n2);
-					Object[] attrN3 = n2.getAttribute("xyz");
-					Point3D p3 = new Point3D((Double)attrN3[0], (Double)attrN3[1], (Double)attrN3[2]);
-					//if()
+					Point3D p3 = new Point3D(n3);
+					if(verificationDistance(p1, p2, p3, 0.1)){
+						
+					}
 				}
 			}
 		}

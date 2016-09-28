@@ -68,6 +68,11 @@ public class Bubulle {
 																		n3.setAttribute("serie", cptSerie5);
 																		n4.setAttribute("serie", cptSerie5);
 																		n5.setAttribute("serie", cptSerie5);
+																		n1.addAttribute("ui.label", cptSerie5);
+																		n2.addAttribute("ui.label", cptSerie5);
+																		n3.addAttribute("ui.label", cptSerie5);
+																		n4.addAttribute("ui.label", cptSerie5);
+																		n5.addAttribute("ui.label", cptSerie5);
 																	}
 																}
 															}
@@ -84,11 +89,25 @@ public class Bubulle {
 				}
 			}
 		}
-		int cptNode = 0;
-		for(Node n:bulles){
-			System.out.println(n.hasAttribute("serie")? n.getAttribute("serie") : "null");
-			cptNode++;
-		}
+		//TODO Suppression des arrêtes de noeud n'appartenant pas à la même série
+		/*for(Node n:bulles){
+			for(Edge e:n){
+				if(!n.hasAttribute("serie")){	
+					bulles.removeEdge(e);
+				}
+				else{
+					Node v = e.getOpposite(n);
+					if(v.getAttribute("serie")!=n.getAttribute("serie")){
+						bulles.removeEdge(e);
+					}
+				}
+			}
+		}*/
+		
+		bulles.addAttribute("ui.stylesheet", "url(style/stylesheet);");
+		bulles.addAttribute("ui.quality");
+		bulles.addAttribute("ui.antialias");
+		bulles.display(false);
 		System.out.println(cptSerie3+" "+cptSerie4+" "+cptSerie5);
 	}
 	

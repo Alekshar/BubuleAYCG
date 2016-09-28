@@ -22,32 +22,74 @@ public class Bubulle {
 		//Création des arrêtes
 		bulles = ProcessUtils.generateEdges(bulles, seuilDistance);
 
-		int cpt =0;
+		int cptSerie3 =0;
+		int cptSerie4 =0;
+		int cptSerie5 =0;
 		//Algo
 		for(Node n1:bulles){
 			Point3D p1 = new Point3D(n1);
 			for(Edge e1:n1){
-				Node n2 = e1.getOpposite(n1);
-				Point3D p2 = new Point3D(n2);
-				
-				for(Edge e2:n2){
-					Node n3 = e2.getOpposite(n2);
-					//On test si le voisin de n2 n'est pas tout simplement n1
-					if(n3.getId()!=n1.getId()){
-						Point3D p3 = new Point3D(n3);
+				if(!n1.hasAttribute("serie")){
+					Node n2 = e1.getOpposite(n1);
+					if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie")){
+						Point3D p2 = new Point3D(n2);
 						
-						//rajouter la vérification d'angle
-						if(p1.verificationDistance( p2, p3, 0.1)){
-							cpt++;
+						for(Edge e2:n2){
+							Node n3 = e2.getOpposite(n2);
+							if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie") && !n3.hasAttribute("serie")){
+								//On test si le voisin de n2 n'est pas tout simplement n1
+								if(n3.getId()!=n1.getId()){
+									Point3D p3 = new Point3D(n3);
+									
+									//Verification des séries de 3
+									//TODO Ajouter la vérification d'angle
+									if(p1.verificationDistance( p2, p3, 0.1)){
+										cptSerie3++;
+										for(Edge e3:n3){
+											Node n4 = e3.getOpposite(n3);
+											if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie") && !n3.hasAttribute("serie")&&!n4.hasAttribute("serie")){
+												if(n4.getId()!=n2.getId()){
+													Point3D p4 = new Point3D(n4);
+													//Verification des séries de 4
+													//TODO Ajouter vérification d'angle
+													if(p2.verificationDistance(p3, p4, 0.1,true)){
+														cptSerie4++;
+														for(Edge e4:n4){
+															Node n5 = e4.getOpposite(n4);
+															if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie") && !n3.hasAttribute("serie")&&!n4.hasAttribute("serie")&&!n5.hasAttribute("serie")){
+																if(n5.getId()!=n3.getId()){
+																	Point3D p5 = new Point3D(n5);
+																	//Verification des séries de 5
+																	//TODO Ajouter vérification d'angle
+																	if(p5.verificationDistance(p4, p3, 0.1)){
+																		cptSerie5++;
+																		n1.setAttribute("serie", cptSerie5);	
+																		n2.setAttribute("serie", cptSerie5);
+																		n3.setAttribute("serie", cptSerie5);
+																		n4.setAttribute("serie", cptSerie5);
+																		n5.setAttribute("serie", cptSerie5);
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
 						}
-					}else{
-						
 					}
-					
 				}
 			}
 		}
-		System.out.println(cpt);
+		int cptNode = 0;
+		for(Node n:bulles){
+			System.out.println(n.hasAttribute("serie")? n.getAttribute("serie") : "null");
+			cptNode++;
+		}
+		System.out.println(cptSerie3+" "+cptSerie4+" "+cptSerie5);
 	}
 	
 	public static double moyenneDesDistance(Graph graph){

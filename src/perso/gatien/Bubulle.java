@@ -11,27 +11,30 @@ public class Bubulle {
 		Graph bulles = new SingleGraph("Bulles");
 		
 		try{
-			bulles.read("dgs/norma_N5_tau4_dt2_delai820_000000.dgs");
+			bulles.read("dgs/norma_N5_tau4_dt2_delai820_000001.dgs");
 		}
 		catch(Exception e){
 			System.out.print("erreur");
 		}
 		
-		double seuilDistance = moyenneDesDistance(bulles)*20/100;
+		double seuilDistance = 2;
 		
 		//Création des arrêtes
 		bulles = ProcessUtils.generateEdges(bulles, seuilDistance);
-
-		int cptSerie3 =0;
-		int cptSerie4 =0;
+		
+		int test =0;
 		int cptSerie5 =0;
 		//Algo
 		for(Node n1:bulles){
 			Point3D p1 = new Point3D(n1);
-			for(Edge e1:n1){
-				if(!n1.hasAttribute("serie")){
+			
+			if(!n1.hasAttribute("serie")){
+				//System.out.println("(1)"+n1.getId()+"\t");
+				//n1.addAttribute("ui.label", n1.getId());
+				for(Edge e1:n1){
 					Node n2 = e1.getOpposite(n1);
 					if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie")){
+						//System.out.println("(2)"+n2.getId()+"\t");
 						Point3D p2 = new Point3D(n2);
 						
 						for(Edge e2:n2){
@@ -42,9 +45,8 @@ public class Bubulle {
 									Point3D p3 = new Point3D(n3);
 									
 									//Verification des séries de 3
-									//TODO Ajouter la vérification d'angle
-									if(p1.verificationDistance( p2, p3, 0.1)){
-										cptSerie3++;
+									if(p1.verificationDistance( p2, p3, 0.1,1)&&(ProcessUtils.getAngle(p1, p2, p3)<10)){
+										//System.out.println("(3)"+n3.getId()+"\t"+ProcessUtils.getAngle(p1, p2, p3));
 										for(Edge e3:n3){
 											Node n4 = e3.getOpposite(n3);
 											if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie") && !n3.hasAttribute("serie")&&!n4.hasAttribute("serie")){
@@ -52,8 +54,8 @@ public class Bubulle {
 													Point3D p4 = new Point3D(n4);
 													//Verification des séries de 4
 													//TODO Ajouter vérification d'angle
-													if(p2.verificationDistance(p3, p4, 0.1,true)){
-														cptSerie4++;
+													if(p2.verificationDistance(p3, p4, 0.1,2)&&(ProcessUtils.getAngle(p2, p3, p4)<10)){
+														//System.out.println("(4)"+n4.getId()+"\t"+ProcessUtils.getAngle(p2, p3, p4));
 														for(Edge e4:n4){
 															Node n5 = e4.getOpposite(n4);
 															if(!n1.hasAttribute("serie")&& !n2.hasAttribute("serie") && !n3.hasAttribute("serie")&&!n4.hasAttribute("serie")&&!n5.hasAttribute("serie")){
@@ -61,18 +63,30 @@ public class Bubulle {
 																	Point3D p5 = new Point3D(n5);
 																	//Verification des séries de 5
 																	//TODO Ajouter vérification d'angle
-																	if(p5.verificationDistance(p4, p3, 0.1)){
+																	//System.out.println(ProcessUtils.getAngle(p3, p4, p5));
+																	if(p3.verificationDistance(p4, p5, 0.1,0.5)&&(ProcessUtils.getAngle(p3, p4, p5)<10)){
+																		//System.out.println("(5)"+n5.getId()+"\t"+ProcessUtils.getAngle(p3, p4, p5));
 																		cptSerie5++;
-																		n1.setAttribute("serie", cptSerie5);	
+																		n1.setAttribute("serie", cptSerie5);
+																		n1.setAttribute("indexSerie", 1);
 																		n2.setAttribute("serie", cptSerie5);
+																		n2.setAttribute("indexSerie", 2);
 																		n3.setAttribute("serie", cptSerie5);
+																		n3.setAttribute("indexSerie", 3);
 																		n4.setAttribute("serie", cptSerie5);
+																		n4.setAttribute("indexSerie", 4);
 																		n5.setAttribute("serie", cptSerie5);
-																		n1.addAttribute("ui.label", cptSerie5);
-																		n2.addAttribute("ui.label", cptSerie5);
-																		n3.addAttribute("ui.label", cptSerie5);
-																		n4.addAttribute("ui.label", cptSerie5);
-																		n5.addAttribute("ui.label", cptSerie5);
+																		n5.setAttribute("indexSerie", 5);
+																		n1.addAttribute("ui.label", cptSerie5+"("+1+")");
+																		n2.addAttribute("ui.label", cptSerie5+"("+2+")");
+																		n3.addAttribute("ui.label", cptSerie5+"("+3+")");
+																		n4.addAttribute("ui.label", cptSerie5+"("+4+")");
+																		n5.addAttribute("ui.label", cptSerie5+"("+5+")");
+																		
+																		/*System.out.print(p1.distance(p2)+" ");
+																		System.out.print(p2.distance(p3)+" ");
+																		System.out.print(p3.distance(p4)+" ");
+																		System.out.println(p4.distance(p5)+" ");*/
 																	}
 																}
 															}
@@ -89,28 +103,37 @@ public class Bubulle {
 				}
 			}
 		}
+		
 		//TODO Suppression des arrêtes de noeud n'appartenant pas à la même série
-		/*for(Node n:bulles){
-			for(Edge e:n){
-				if(!n.hasAttribute("serie")){	
-					bulles.removeEdge(e);
-				}
-				else{
-					Node v = e.getOpposite(n);
-					if(v.getAttribute("serie")!=n.getAttribute("serie")){
-						bulles.removeEdge(e);
-					}
-				}
-			}
-		}*/
+		removeEdge(bulles);
+		addEdgeSameSerie(bulles);
 		
 		bulles.addAttribute("ui.stylesheet", "url(style/stylesheet);");
 		bulles.addAttribute("ui.quality");
 		bulles.addAttribute("ui.antialias");
 		bulles.display(false);
-		System.out.println(cptSerie3+" "+cptSerie4+" "+cptSerie5);
+		System.out.println(test);
+		System.out.println(cptSerie5);
 	}
-	
+	public static void addEdgeSameSerie(Graph graph){
+		for(Node n1:graph){
+			for(Node n2:graph){
+				if(n1.hasAttribute("serie")&&n2.hasAttribute("serie")){
+					if(n1.getId()!=n2.getId()&&n1.getAttribute("serie").equals(n2.getAttribute("serie"))){
+						if(n1.getNumber("indexSerie")-n2.getNumber("indexSerie")==1){
+							if(!n1.hasEdgeBetween(n2)){
+								graph.addEdge(n1.getId()+n2.getId(), n1, n2);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	public static void removeEdge(Graph graph){
+		while (graph.getEdgeCount() > 0)
+		    graph.removeEdge(0);
+	}
 	public static double moyenneDesDistance(Graph graph){
 		
 		double cpt =0.0;

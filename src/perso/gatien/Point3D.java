@@ -61,32 +61,12 @@ public class Point3D {
 		return nb*margeErreur;
 	}
 
-	public Vector2d getVectorTo(Point3D other) {
-		return new Vector2d(other.getX()-this.getX(), other.getY()-this.getY()/*, other.getZ()-this.getZ()*/);
+	public Vector2d getVector2DTo(Point3D other) {
+		return new Vector2d(other.getX()-this.getX(), other.getY()-this.getY());
 	}
 	
-	public static void main(String[] args) {
-		Point3D p1 = new Point3D(0,0,0);
-		Point3D p2 = new Point3D(1,0,0);
-		Point3D p3 = new Point3D(2,0,0);
-		Point3D p4 = new Point3D(4,0,0);
-		Point3D p5 = new Point3D(5,0,0);
-		Point3D p6 = new Point3D(1,1,1);
-		Point3D p7 = new Point3D(5,2,3);
-		
-		/*System.out.println(p1.distance(p2));
-		System.out.println(p1.distance(p4));
-		System.out.println(p2.distance(p6)); // => racine de 2
-		
-		System.out.println(p1.verificationDistance(p2, p3, 0.1,1));
-		System.out.println(p1.verificationDistance(p2, p4, 0.1,1));
-		System.out.println(p2.verificationDistance(p3, p4, 0.1,1));
-		System.out.println(p2.verificationDistance(p3, p4, 0.1,2));
-		System.out.println(p1.verificationDistance(p2, p3, 0.1,2));*/
-		
-		
-		System.out.println(ProcessUtils.getAngle(p2, p6, p7));
+	public Vector3d getVector3DTo(Point3D other) {
+		return new Vector3d(other.getX()-this.getX(), other.getY()-this.getY(), other.getZ()-this.getZ());
 	}
-
 }
 

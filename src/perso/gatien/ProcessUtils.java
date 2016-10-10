@@ -38,8 +38,8 @@ public final class ProcessUtils {
 	}
 
 	public static double getAngle(Point3D a, Point3D b, Point3D c){
-		Vector2d ab = a.getVectorTo(b);
-		Vector2d bc = b.getVectorTo(c);
+		Vector2d ab = a.getVector2DTo(b);
+		Vector2d bc = b.getVector2DTo(c);
 		double radian = ab.angle(bc);
 		double angle = Math.toDegrees(radian);
 		return angle;

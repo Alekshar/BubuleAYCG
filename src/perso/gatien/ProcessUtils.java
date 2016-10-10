@@ -23,7 +23,7 @@ public final class ProcessUtils {
 			for (Node p2 : graph) {
 				if(p2.getId()!=p1.getId()){
 					Point3D cP2 = new Point3D(p2);
-					double distanceP1P2 = cP1.distance(cP2);
+					double distanceP1P2 = cP1.distance(cP2,false);
 					if (distanceP1P2 < distanceLimit) {
 						try {
 							graph.addEdge(p1.getId() + p2.getId(), p1, p2);

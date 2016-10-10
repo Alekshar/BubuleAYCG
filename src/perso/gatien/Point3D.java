@@ -41,12 +41,17 @@ public class Point3D {
 		return "("+this.x+" ; "+this.y+" ; "+this.z+")";
 	}
 	
-	public double distance(Point3D c1){
-		return Math.sqrt( Math.pow(c1.getX()-this.getX(),2)+Math.pow(c1.getY()-this.getY(),2)/*+Math.pow(c1.getZ()-this.getZ(),2)*/);
+	public double distance(Point3D c1,boolean troisD){
+		if(troisD){
+			return Math.sqrt( Math.pow(c1.getX()-this.getX(),2)+Math.pow(c1.getY()-this.getY(),2)+Math.pow(c1.getZ()-this.getZ(),2));
+		}else{
+			return Math.sqrt( Math.pow(c1.getX()-this.getX(),2)+Math.pow(c1.getY()-this.getY(),2));
+		}
+		
 	}
 	
-	public boolean verificationDistance(Point3D pB, Point3D pC, double margeErreur, double ratio){
-		if(Math.abs(this.distance(pB)*ratio-pB.distance(pC))< seuilErreur(this.distance(pB), margeErreur)){
+	public boolean verificationDistance(Point3D pB, Point3D pC, double margeErreur, double ratio,boolean troisD){
+		if(Math.abs(this.distance(pB, troisD)*ratio-pB.distance(pC,troisD))< seuilErreur(this.distance(pB,troisD), margeErreur)){
 			return true;
 		}
 		return false;	
@@ -69,7 +74,7 @@ public class Point3D {
 		Point3D p6 = new Point3D(1,1,1);
 		Point3D p7 = new Point3D(5,2,3);
 		
-		System.out.println(p1.distance(p2));
+		/*System.out.println(p1.distance(p2));
 		System.out.println(p1.distance(p4));
 		System.out.println(p2.distance(p6)); // => racine de 2
 		
@@ -77,7 +82,7 @@ public class Point3D {
 		System.out.println(p1.verificationDistance(p2, p4, 0.1,1));
 		System.out.println(p2.verificationDistance(p3, p4, 0.1,1));
 		System.out.println(p2.verificationDistance(p3, p4, 0.1,2));
-		System.out.println(p1.verificationDistance(p2, p3, 0.1,2));
+		System.out.println(p1.verificationDistance(p2, p3, 0.1,2));*/
 		
 		
 		System.out.println(ProcessUtils.getAngle(p2, p6, p7));

@@ -8,14 +8,13 @@ public class Creer {
 		String adresseDuFichier = workspace;
 		String dirFileName = "/workspace/.data.txt";
 		Repertoire rep = Repertoire.getInstance(adresseDuFichier);
-		Repertoire repData = Repertoire.getInstanceD(adresseDuFichier+"/workspace");
 		
 		File f = new File(adresseDuFichier+dirFileName);
 
 		if (f.exists())  
-			System.out.println("Fichier existant");
+			System.out.println("Fichier existant !");
 		else{ 
-			System.out.println("Fichier not found");
+			System.out.println("Fichier n'existe pas mais on va le créer !");
 			try	{
 				/**
 				 * BufferedWriter a besoin d un FileWriter, 
@@ -25,9 +24,8 @@ public class Creer {
 				 */
 	
 				FileWriter fw = new FileWriter(adresseDuFichier+dirFileName, true);
-				Serialiser.serialiser(rep, adresseDuFichier);
 				fw.close();
-				System.out.println("fichier crée");
+				System.out.println("Fichier crée !");
 			}
 			catch(IOException ioe) {
 				System.out.print("Erreur : ");

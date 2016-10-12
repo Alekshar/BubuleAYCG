@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,6 +28,12 @@ import javax.swing.text.View;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.stream.file.FileSinkImages;
+import org.graphstream.stream.file.FileSinkImages.LayoutPolicy;
+import org.graphstream.stream.file.FileSinkImages.OutputType;
+import org.graphstream.stream.file.FileSinkImages.Resolution;
+import org.graphstream.stream.file.FileSinkImages.Resolutions;
+import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
 
@@ -39,8 +46,7 @@ public class IHM extends JFrame implements ActionListener{
 	private final static int SCREEN_H = 800;
 	// IHM
 	private JPanel generalPan, northPan, topNorthPan, bottomNorthPan, centerPan, eastPan;
-	private PanelArbre panelArb;
-	private JButton fichier, convertir;
+	private JButton fichier, analyserAfficher, effacer, image, trajectoire, sauvegarder, convertir;
 	private JLabel infoConvertion;
 	private JTextField jtf;
 	private String pathFileSelected, nameFileSelected, fileTypeSelected;
@@ -50,9 +56,10 @@ public class IHM extends JFrame implements ActionListener{
 	private Graph graph;
 	private Viewer viewer;
     private ViewPanel view;
-	// Workspace
-	private JFileChooser workspace;
-	private String Sworkspace;
+    // Loader
+    private Loader loader;
+    // Graph loaded
+    private Graph graphLoaded;
 	
 	/******************/
 	/** Constructeur **/
@@ -63,109 +70,91 @@ public class IHM extends JFrame implements ActionListener{
 		//setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setLayout(new BorderLayout());
 		
+		// Positionne la fenêtre au milieu de l'écran
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setLocation(dim.width/4 - this.getWidth()/4, dim.height/6 - this.getHeight()/6);
+		this.setLocation((dim.width/2 - this.getWidth())/2, (dim.height/4 - this.getHeight())/2);
 		
-		/*
-		 * Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-			f.setLocation(dim.width/2 - f.getWidth()/2, dim.height/2 - f.getHeight()/2);
-		 *  f pour frame
-		 * */
 		/************************************************/
-		/*
-		 * Choix du dossier JFileChooser (directement racine)
-		 * Changement du titre du JFileChooser
-		 * Choix du repertoire ou save workspace
-		 * setVisible de la frame
-		 * Recuperation selection sWorkspace 
-		 */
-		workspace = new JFileChooser(new File("~/"));
-		workspace.setDialogTitle("Choisissez votre dossier de travail :");
-		workspace.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		workspace.showOpenDialog(this);
-		Sworkspace = workspace.getSelectedFile().toString(); 
+		generalPan = new JPanel();
+		generalPan.setLayout(new BorderLayout());
 		
-		// Si notre dossier ou l'on save le workspace est choisi alors ...
-		if(Sworkspace != null ){
-			// Création du dossier workspace
-			Creer.CreerDir(Sworkspace);
-			
-			/************************************************/
-			generalPan = new JPanel();
-			generalPan.setLayout(new BorderLayout());
-			
-			// Panneau du haut
-			northPan = new JPanel();
-			northPan.setLayout(new BorderLayout());
-			northPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Choix de fichiers txt à convertir"));
-			
-			topNorthPan = new JPanel();
-			bottomNorthPan = new JPanel();
+		// Panneau du haut
+		northPan = new JPanel();
+		northPan.setLayout(new BorderLayout());
+		northPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Choix du fichier txt"));
+		
+		topNorthPan = new JPanel();
+		bottomNorthPan = new JPanel();
 
-			fichier = new JButton("Fichier");
-			fichier.addActionListener(this);
-			jtf = new JTextField(50);
-			convertir = new JButton("Convertir");
-			convertir.addActionListener(this);
-			infoConvertion = new JLabel(" ");
-			
-			topNorthPan.add(fichier);
-			topNorthPan.add(jtf);
-			topNorthPan.add(convertir);
-			bottomNorthPan.add(infoConvertion);
-			
-			northPan.add(topNorthPan, BorderLayout.NORTH);
-			northPan.add(bottomNorthPan, BorderLayout.SOUTH);
-			generalPan.add(northPan, BorderLayout.NORTH);
-			
-			// Panneau central
-			graphCode();
-			centerPan = new JPanel();
-			centerPan.setLayout(new BorderLayout());
-			centerPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Affichage"));
-			centerPan.add(view, BorderLayout.CENTER);
-			generalPan.add(centerPan, BorderLayout.CENTER);
-			
-			// Panneau de droite
-			eastPan = new JPanel();
-			eastPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Options"));
-			generalPan.add(eastPan, BorderLayout.EAST);
-			
-			// Panneau de gauche
-			panelArb = new PanelArbre(this);
-			generalPan.add(panelArb, BorderLayout.WEST);
-			
-			// Frame
-			/*this.add(northPan, BorderLayout.NORTH);
-			this.add(centerPan, BorderLayout.CENTER);
-			this.add(eastPan, BorderLayout.EAST);*/
-			this.add(generalPan);
-			
-			this.addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent we) {System.exit(0);}
-			});
-			/************************************************/
-			pack();
-			setVisible(true);
-			//setResizable(false);
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			
-			//graphCode();
-		}
+		fichier = new JButton("Fichier");
+		fichier.addActionListener(this);
+		jtf = new JTextField(50);
+		analyserAfficher = new JButton("Analyser et Afficher");
+		analyserAfficher.addActionListener(this);
+		infoConvertion = new JLabel(" ");
+		
+		topNorthPan.add(fichier);
+		topNorthPan.add(jtf);
+		topNorthPan.add(analyserAfficher);
+		bottomNorthPan.add(infoConvertion);
+		
+		northPan.add(topNorthPan, BorderLayout.NORTH);
+		northPan.add(bottomNorthPan, BorderLayout.SOUTH);
+		generalPan.add(northPan, BorderLayout.NORTH);
+		
+		// Panneau central
+		centerPan = new JPanel();
+		centerPan.setLayout(new BorderLayout());
+		centerPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Affichage"));
+		//centerPan.add(view, BorderLayout.CENTER);
+		generalPan.add(centerPan, BorderLayout.CENTER);
+		
+		// Panneau de droite
+		eastPan = new JPanel();
+		eastPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Options"));
+		eastPan.setLayout(new GridLayout(5, 1));
+		trajectoire = new JButton("Trajectoire");
+		trajectoire.addActionListener(this);
+		image = new JButton("Screenshot");
+		image.addActionListener(this);
+		sauvegarder = new JButton("Sauvegarder");
+		sauvegarder.addActionListener(this);
+		convertir = new JButton("Convertir");
+		convertir.addActionListener(this);
+		effacer = new JButton("Effacer");
+		effacer.addActionListener(this);
+		
+		eastPan.add(trajectoire);
+		eastPan.add(image);
+		eastPan.add(sauvegarder);
+		eastPan.add(convertir);
+		eastPan.add(effacer);
+		generalPan.add(eastPan, BorderLayout.EAST);
+		
+		// Panneau de gauche
+		
+		// Frame
+		/*this.add(northPan, BorderLayout.NORTH);
+		this.add(centerPan, BorderLayout.CENTER);
+		this.add(eastPan, BorderLayout.EAST);*/
+		this.add(generalPan);
+		
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {System.exit(0);}
+		});
+		/************************************************/
+		pack();
+		setVisible(true);
+		//setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
-	/***************/
-	/** GET / SET **/
-	/***************/
-	public String getSworkspace(){ return Sworkspace; }
-	public Repertoire getWorkspace(){ return panelArb.getWorkspace();}
-	public PanelArbre getPanelArb(){ return panelArb;} 
 	
 	/*************************/
 	/** Actions des boutons **/
 	/*************************/
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// Action bouton Fichier
 		if(e.getSource() == fichier) {
 			if(jtf.getText() != "") {
 				jtf.setText("");
@@ -188,31 +177,77 @@ public class IHM extends JFrame implements ActionListener{
 			//lastIndex =  pathFileSelected.lastIndexOf("/");
 			//nameFileSelected = pathFileSelected.substring(lastIndex+1, pathFileSelected.length()-4);
 			
-			jtf.setText(nameFileSelected+fileTypeSelected);
+			// Si on ouvre la fenêtre de recherche de fichier
+			// mais que finalement on ne choisit rien
+			// on supprime le message d'erreur
+			if(pathFileSelected.equals("nullnull"))
+				jtf.setText("");
+			else
+				jtf.setText(nameFileSelected+fileTypeSelected);
 		}
 		
-		if(e.getSource() == convertir) {
+		// Action bouton analyserAfficher
+		if(e.getSource() == analyserAfficher) {
 			
 			// Si le type du fichier est bon
 			if(fileTypeSelected.equals(".txt")) {
-				try {
-					txtToGsd(pathFileSelected,nameFileSelected);
-				} catch (IOException e1) {e1.printStackTrace();}
+				graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
+				
+				graphCode(graphLoaded);
 				
 				infoConvertion.setForeground(Color.BLACK);
-				infoConvertion.setText("Le fichier a bien été converti.");
+				infoConvertion.setText("Le fichier a bien été analysé.");
 			}
 			else {
 				infoConvertion.setForeground(Color.RED);
 				infoConvertion.setText("Erreur : Le type du fichier n'est pas un .txt !");
 			}
-			/*open = new FileDialog(this);
-			open.setVisible(true);
-			nameFileSelected = open.getDirectory()+open.getFile();
-			System.out.println(nameFileSelected);
-			jtf.setText(nameFileSelected);*/
+		}
+		/***********************/
+		/* Boutons des Options */
+		/***********************/
+		if(e.getSource() == trajectoire) {
+			
 		}
 		
+		if(e.getSource() == image) {
+			if(viewer != null){
+				open = new FileDialog(this, "Sauvegardez votre image", FileDialog.SAVE);
+				open.setVisible(true);
+				
+				pathFileSelected = open.getDirectory()+open.getFile();
+				fileTypeSelected = pathFileSelected.substring(pathFileSelected.length()-4, pathFileSelected.length()-3);
+
+				if(!fileTypeSelected.equals("."))
+					pathFileSelected = open.getDirectory()+open.getFile()+".png";
+					
+				/*Autre méthode sans utiliser le FileSinkImages
+				 * this.getGraphLoaded().addAttribute("ui.screenshot", pathFileSelected);
+				*/
+				
+				FileSinkImages pic = new FileSinkImages(OutputType.PNG, Resolutions.HD720);
+				try {
+					pic.writeAll(getGraphLoaded(), pathFileSelected);
+				} catch (IOException e1) {e1.printStackTrace();}
+			
+			}
+		}
+		
+		if(e.getSource() == sauvegarder) {
+			
+		}
+
+		if(e.getSource() == convertir) {
+	
+		}
+
+		// Efface l'affichage du graph
+		if(e.getSource() == effacer) {
+			if(viewer != null) {
+				viewer.close();
+				centerPan.repaint();
+			}
+		}		
 	}
 	
 	/**************************************/
@@ -241,29 +276,39 @@ public class IHM extends JFrame implements ActionListener{
 
         } catch (IOException e) {e.printStackTrace();}
         
-        graphconverter.write("data/"+fileName+".dgs");
+        //graphconverter.write(getSworkspace()+"/workspace/data/"+fileName+".dgs");
 	}
 	
 	/*******************/
 	/** Code du graph **/
 	/*******************/
-	public void graphCode() {
-		graph = new SingleGraph("Tutorial 1");
-		
+	public void graphCode(Graph graph) {
 		// Permet de générer le graph dans l'IHM directement
-		viewer = new Viewer(graph,Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
-		viewer.enableAutoLayout();
-		view = (ViewPanel) viewer.addDefaultView(false);
-		//view.setEnabled(true);
+		if(view != null) {
+			viewer.close();
+			viewer = new Viewer(graph,Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+			view = (ViewPanel) viewer.addDefaultView(false);
+			centerPan.repaint();
+		}
+		else {
+			viewer = new Viewer(graph,Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+			view = (ViewPanel) viewer.addDefaultView(false);
+		}
 		
-		graph.addNode("A" );
-		graph.addNode("B" );
-		graph.addNode("C" );
-		graph.addEdge("AB", "A", "B");
-		graph.addEdge("BC", "B", "C");
-		graph.addEdge("CA", "C", "A");
-
+		/* Autre moyen
+		 * viewer = graph.displaey();
+		 * view = viewer.getDefaultView();
+		 * */
+		//viewer.enableAutoLayout();
+		//view.setEnabled(true);
+		this.centerPan.add(view, BorderLayout.CENTER);
+		
 	}
+	
+	/***************/
+	/** GET / SET **/
+	/***************/
+	public Graph getGraphLoaded(){return this.graphLoaded;}
 	
 	/*************************************/
 	/** Lancement du programme sécurisé **/

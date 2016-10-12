@@ -11,13 +11,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -29,11 +27,8 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 import org.graphstream.stream.file.FileSinkImages;
-import org.graphstream.stream.file.FileSinkImages.LayoutPolicy;
 import org.graphstream.stream.file.FileSinkImages.OutputType;
-import org.graphstream.stream.file.FileSinkImages.Resolution;
 import org.graphstream.stream.file.FileSinkImages.Resolutions;
-import org.graphstream.ui.graphicGraph.GraphicGraph;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
 
@@ -47,7 +42,7 @@ public class IHM extends JFrame implements ActionListener{
 	// IHM
 	private JPanel generalPan, northPan, topNorthPan, bottomNorthPan, centerPan, eastPan;
 	private JButton fichier, analyserAfficher, effacer, image, trajectoire, sauvegarder, convertir;
-	private JLabel infoConvertion;
+	private JLabel infoAffAn;
 	private JTextField jtf;
 	private String pathFileSelected, nameFileSelected, fileTypeSelected;
 	// Fichier / Dossier
@@ -60,6 +55,8 @@ public class IHM extends JFrame implements ActionListener{
     private Loader loader;
     // Graph loaded
     private Graph graphLoaded;
+    // Algo
+    private Bubulle algoGatien;
 	
 	/******************/
 	/** Constructeur **/
@@ -91,12 +88,12 @@ public class IHM extends JFrame implements ActionListener{
 		jtf = new JTextField(50);
 		analyserAfficher = new JButton("Analyser et Afficher");
 		analyserAfficher.addActionListener(this);
-		infoConvertion = new JLabel(" ");
+		infoAffAn = new JLabel(" ");
 		
 		topNorthPan.add(fichier);
 		topNorthPan.add(jtf);
 		topNorthPan.add(analyserAfficher);
-		bottomNorthPan.add(infoConvertion);
+		bottomNorthPan.add(infoAffAn);
 		
 		northPan.add(topNorthPan, BorderLayout.NORTH);
 		northPan.add(bottomNorthPan, BorderLayout.SOUTH);
@@ -158,7 +155,7 @@ public class IHM extends JFrame implements ActionListener{
 		if(e.getSource() == fichier) {
 			if(jtf.getText() != "") {
 				jtf.setText("");
-				infoConvertion.setText(" ");
+				infoAffAn.setText(" ");
 			}
 			
 			open = new FileDialog(this);
@@ -193,14 +190,16 @@ public class IHM extends JFrame implements ActionListener{
 			if(fileTypeSelected.equals(".txt")) {
 				graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
 				
-				graphCode(graphLoaded);
+				algoGatien = new Bubulle(graphLoaded);
 				
-				infoConvertion.setForeground(Color.BLACK);
-				infoConvertion.setText("Le fichier a bien été analysé.");
+				displayGraph(algoGatien.getGraph());
+				
+				infoAffAn.setForeground(Color.BLACK);
+				infoAffAn.setText("Le fichier a bien été analysé.");
 			}
 			else {
-				infoConvertion.setForeground(Color.RED);
-				infoConvertion.setText("Erreur : Le type du fichier n'est pas un .txt !");
+				infoAffAn.setForeground(Color.RED);
+				infoAffAn.setText("Erreur : Le type du fichier n'est pas un .txt !");
 			}
 		}
 		/***********************/
@@ -246,6 +245,9 @@ public class IHM extends JFrame implements ActionListener{
 			if(viewer != null) {
 				viewer.close();
 				centerPan.repaint();
+				jtf.setText("");
+				infoAffAn.setText("");
+				this.view = null;
 			}
 		}		
 	}
@@ -282,7 +284,7 @@ public class IHM extends JFrame implements ActionListener{
 	/*******************/
 	/** Code du graph **/
 	/*******************/
-	public void graphCode(Graph graph) {
+	public void displayGraph(Graph graph) {
 		// Permet de générer le graph dans l'IHM directement
 		if(view != null) {
 			viewer.close();

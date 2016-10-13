@@ -26,6 +26,7 @@ import javax.swing.text.View;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.stream.file.FileSinkDGS;
 import org.graphstream.stream.file.FileSinkImages;
 import org.graphstream.stream.file.FileSinkImages.OutputType;
 import org.graphstream.stream.file.FileSinkImages.Resolutions;
@@ -41,7 +42,7 @@ public class IHM extends JFrame implements ActionListener{
 	private final static int SCREEN_H = 800;
 	// IHM
 	private JPanel generalPan, northPan, topNorthPan, bottomNorthPan, centerPan, eastPan;
-	private JButton fichier, analyserAfficher, effacer, image, trajectoire, sauvegarder, convertir;
+	private JButton fichier, analyserAfficher, effacer, image, trajectoire;
 	private JLabel infoAffAn;
 	private JTextField jtf;
 	private String pathFileSelected, nameFileSelected, fileTypeSelected;
@@ -114,26 +115,15 @@ public class IHM extends JFrame implements ActionListener{
 		trajectoire.addActionListener(this);
 		image = new JButton("Screenshot");
 		image.addActionListener(this);
-		sauvegarder = new JButton("Sauvegarder");
-		sauvegarder.addActionListener(this);
-		convertir = new JButton("Convertir");
-		convertir.addActionListener(this);
 		effacer = new JButton("Effacer");
 		effacer.addActionListener(this);
 		
 		eastPan.add(trajectoire);
 		eastPan.add(image);
-		eastPan.add(sauvegarder);
-		eastPan.add(convertir);
 		eastPan.add(effacer);
 		generalPan.add(eastPan, BorderLayout.EAST);
 		
-		// Panneau de gauche
-		
 		// Frame
-		/*this.add(northPan, BorderLayout.NORTH);
-		this.add(centerPan, BorderLayout.CENTER);
-		this.add(eastPan, BorderLayout.EAST);*/
 		this.add(generalPan);
 		
 		this.addWindowListener(new WindowAdapter() {
@@ -181,17 +171,17 @@ public class IHM extends JFrame implements ActionListener{
 				jtf.setText("");
 			else
 				jtf.setText(nameFileSelected+fileTypeSelected);
+
+			//graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
+			//displayGraph(graphLoaded);
 		}
 		
 		// Action bouton analyserAfficher
 		if(e.getSource() == analyserAfficher) {
-			
 			// Si le type du fichier est bon
 			if(fileTypeSelected.equals(".txt")) {
 				graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
-				
-				algoGatien = new Bubulle(graphLoaded);
-				
+				algoGatien = new Bubulle(graphLoaded);				
 				displayGraph(algoGatien.getGraph());
 				
 				infoAffAn.setForeground(Color.BLACK);
@@ -207,6 +197,19 @@ public class IHM extends JFrame implements ActionListener{
 		/***********************/
 		if(e.getSource() == trajectoire) {
 			
+			// Ouvrir une boite de dialogue
+			if(viewer != null) {
+				open = new FileDialog(this, "Sauvegardez les trajectoires dans un fichier txt", FileDialog.SAVE);
+				open.setVisible(true);
+				pathFileSelected = open.getDirectory()+open.getFile();
+				fileTypeSelected = pathFileSelected.substring(pathFileSelected.length()-4, pathFileSelected.length()-3);
+				
+				if(!fileTypeSelected.equals("."))
+					pathFileSelected = open.getDirectory()+open.getFile()+".txt";
+				
+				algoGatien.getTrajectoire(pathFileSelected);
+				
+			}			
 		}
 		
 		if(e.getSource() == image) {
@@ -230,14 +233,6 @@ public class IHM extends JFrame implements ActionListener{
 				} catch (IOException e1) {e1.printStackTrace();}
 			
 			}
-		}
-		
-		if(e.getSource() == sauvegarder) {
-			
-		}
-
-		if(e.getSource() == convertir) {
-	
 		}
 
 		// Efface l'affichage du graph
@@ -270,9 +265,13 @@ public class IHM extends JFrame implements ActionListener{
                 double x = Double.valueOf(buble[1]).doubleValue();
                 double y = Double.valueOf(buble[2]).doubleValue();
                 double z = Double.valueOf(buble[3]).doubleValue();
+                double col4 = Double.valueOf(buble[4]).doubleValue(); //modifier nom
+                double col5 = Double.valueOf(buble[5]).doubleValue(); //modifier nom
                 
                 Node node = graphconverter.addNode("B"+counter);
                 node.setAttribute("xyz", x, y, z);
+                node.setAttribute("col4", col4);
+                node.setAttribute("col5", col5);
                 counter++;
             }
 
@@ -298,7 +297,7 @@ public class IHM extends JFrame implements ActionListener{
 		}
 		
 		/* Autre moyen
-		 * viewer = graph.displaey();
+		 * viewer = graph.display();
 		 * view = viewer.getDefaultView();
 		 * */
 		//viewer.enableAutoLayout();

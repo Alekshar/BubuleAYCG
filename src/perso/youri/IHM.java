@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -11,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -19,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.text.View;
@@ -42,7 +46,7 @@ public class IHM extends JFrame implements ActionListener{
 	private final static int SCREEN_H = 800;
 	// IHM
 	private JPanel generalPan, northPan, topNorthPan, bottomNorthPan, centerPan, eastPan;
-	private JButton fichier, analyserAfficher, effacer, image, trajectoire;
+	private JButton fichier, analyserAfficher, effacer, image, trajectoire, help;
 	private JLabel infoAffAn;
 	private JTextField jtf;
 	private String pathFileSelected, nameFileSelected, fileTypeSelected;
@@ -79,10 +83,11 @@ public class IHM extends JFrame implements ActionListener{
 		// Panneau du haut
 		northPan = new JPanel();
 		northPan.setLayout(new BorderLayout());
-		northPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Choix du fichier txt"));
 		
 		topNorthPan = new JPanel();
+		topNorthPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Choix du fichier txt"));
 		bottomNorthPan = new JPanel();
+		bottomNorthPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Informations"));
 
 		fichier = new JButton("Fichier");
 		fichier.addActionListener(this);
@@ -117,10 +122,13 @@ public class IHM extends JFrame implements ActionListener{
 		image.addActionListener(this);
 		effacer = new JButton("Effacer");
 		effacer.addActionListener(this);
+		help = new JButton("Aide");
+		help.addActionListener(this);
 		
 		eastPan.add(trajectoire);
 		eastPan.add(image);
 		eastPan.add(effacer);
+		eastPan.add(help);
 		generalPan.add(eastPan, BorderLayout.EAST);
 		
 		// Frame
@@ -241,10 +249,39 @@ public class IHM extends JFrame implements ActionListener{
 				viewer.close();
 				centerPan.repaint();
 				jtf.setText("");
-				infoAffAn.setText("");
+				infoAffAn.setText("L'affichage a bien été effacé.");
 				this.view = null;
 			}
-		}		
+		}
+		
+		// Bouton Aide
+		if(e.getSource() == help) {
+			JFrame help = new JFrame("Aide");
+			JPanel helpPan = new JPanel(new FlowLayout());
+
+			help.setPreferredSize(new Dimension(800,500));
+			help.setLayout(new BorderLayout());
+			
+			StringBuilder strB = new StringBuilder();
+			try (BufferedReader br = new BufferedReader(new FileReader("data/README.txt"))) {
+	        	String strLine;
+	        	
+	        	while((strLine = br.readLine()) != null) {
+	        		strB.append(strLine+"\n");
+	        	}
+	        	br.close();	
+	        } catch (IOException e1) {e1.printStackTrace();}
+			
+			JTextArea infos = new JTextArea();
+			infos.setText(strB.toString());
+			infos.setEditable(false);
+			infos.setBackground(null);
+			
+			helpPan.add(infos);
+			help.add(helpPan);
+			help.pack();
+			help.setVisible(true);
+		}
 	}
 	
 	/**************************************/

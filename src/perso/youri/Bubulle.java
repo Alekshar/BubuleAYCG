@@ -9,6 +9,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
+import org.json.*;
 
 //Ajouter une meilleure vérification des distances
 public class Bubulle {
@@ -17,22 +18,18 @@ public class Bubulle {
 	private int numTrajectoire;
 	private ArrayList<String> alTrajectoire;
 	
-	public Bubulle(Graph graph) {
+	public Bubulle(Graph graph) throws JSONException, IOException {
 		bulles = graph;
 		numTrajectoire = 0;
 		alTrajectoire = new ArrayList<String>();
 		
-		//Création des arrètes
-		for(double seuilDistance =0.2;seuilDistance<1.3;seuilDistance+=0.2){
-			algo(bulles,seuilDistance,0.1,20.0,true);
-			algo(bulles,seuilDistance,0.1,20.0,false);
-			algo(bulles,seuilDistance,0.2,20.0,true);			
-			algo(bulles,seuilDistance,0.2,20.0,false);				
-			algo(bulles,seuilDistance,0.3,20.0,true);
-			algo(bulles,seuilDistance,0.3,20.0,false);
-			algo(bulles,seuilDistance,0.3,25.0,true);
-			algo(bulles,seuilDistance,0.3,25.0,false);
-			algo(bulles,seuilDistance,0.3,30.0,true);
+		JSONObject jobj = new JSONObject(ProcessUtils.fileString("conf/configuration.json"));
+		
+		for(double seuilDistance =jobj.getJSONObject("seuilDistance").getDouble("min");seuilDistance<jobj.getJSONObject("seuilDistance").getDouble("max");seuilDistance+=jobj.getJSONObject("seuilDistance").getDouble("pas")){
+			JSONArray arr = jobj.getJSONArray("tests");
+			for(int i=0;i<arr.length();i++){
+				algo(bulles,seuilDistance,arr.getJSONObject(i).getDouble("margeErreur"),arr.getJSONObject(i).getDouble("angleMax"),arr.getJSONObject(i).getBoolean("3D"));
+			}
 		}
 		
 		removeEdge(bulles);

@@ -1,6 +1,10 @@
 package perso.youri;
 
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector3d;
 
@@ -49,5 +53,20 @@ public final class ProcessUtils {
 	public static boolean checkAngle(Point3D a, Point3D b, Point3D c, Point3D d, double toleratedAngle){
 		return Math.abs(getAngle(a, b, c)-getAngle(b,c,d)) < toleratedAngle;
 	}
-	
+	public static String fileString(String path) throws IOException{
+		BufferedReader reader = new BufferedReader(new FileReader (path));
+	    String         line = null;
+	    StringBuilder  stringBuilder = new StringBuilder();
+	    String         ls = System.getProperty("line.separator");
+	    try {
+	        while((line = reader.readLine()) != null) {
+	            stringBuilder.append(line);
+	            stringBuilder.append(ls);
+	        }
+
+	        return stringBuilder.toString();
+	    } finally {
+	        reader.close();
+	    }
+	}
 }

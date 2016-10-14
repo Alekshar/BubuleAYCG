@@ -36,6 +36,7 @@ import org.graphstream.stream.file.FileSinkImages.OutputType;
 import org.graphstream.stream.file.FileSinkImages.Resolutions;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
+import org.json.JSONException;
 
 public class IHM extends JFrame implements ActionListener{
 
@@ -189,7 +190,15 @@ public class IHM extends JFrame implements ActionListener{
 			// Si le type du fichier est bon
 			if(fileTypeSelected.equals(".txt")) {
 				graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
-				algoGatien = new Bubulle(graphLoaded);				
+				try {
+					algoGatien = new Bubulle(graphLoaded);
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				
 				displayGraph(algoGatien.getGraph());
 				
 				infoAffAn.setForeground(Color.BLACK);

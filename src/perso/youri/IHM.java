@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -195,8 +194,8 @@ public class IHM extends JFrame implements ActionListener, ChangeListener{
 			else
 				jtf.setText(nameFileSelected+fileTypeSelected);
 			
-			this.isAfficher = false;
-			this.isAnalyser = false;
+			isAfficher = false;
+			isAnalyser = false;
 		}
 		
 		// Action bouton Afficher
@@ -309,8 +308,8 @@ public class IHM extends JFrame implements ActionListener, ChangeListener{
 				infoSlider.setText("");
 				this.view = null;
 				this.viewer = null;
-				this.isAfficher = false;
-				this.isAnalyser = false;
+				isAfficher = false;
+				isAnalyser = false;
 			}
 		}
 		
@@ -389,9 +388,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener{
 		JSlider source = (JSlider) e.getSource();
 		int cpt = (int)source.getValue();
 		
-		if(cpt == 0) {
+		if(cpt == 0) 
 			resetSlider();
-		}
+		
 		// Zoom
 		if(cpt > 0 && cpt > sliderTmpCpt && sliderPercent >= 0) {
 			view.getCamera().setViewPercent(sliderPercent-0.2);
@@ -403,9 +402,6 @@ public class IHM extends JFrame implements ActionListener, ChangeListener{
 			sliderPercent += 0.2;
 		}			
 		sliderTmpCpt = cpt;
-		System.out.println("cpt : " + cpt);
-		System.out.println("sliderTmp : " + sliderTmpCpt);
-		System.out.println("pourcent : " + sliderPercent);
 	}
 	
 	/************************/

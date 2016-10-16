@@ -1,6 +1,4 @@
 package perso.youri;
-
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,11 +6,10 @@ import java.util.ArrayList;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
 import org.json.*;
 
 //Ajouter une meilleure v�rification des distances
-public class Bubulle {
+public class Bubulle{
 	
 	private Graph bulles;
 	private int numTrajectoire;
@@ -83,11 +80,11 @@ public class Bubulle {
 		return graph;
 	}
 	
-	/** Paramètres
-		* @param graph 			: Graphe représentant le fichier de point dont les arrêtes ont été préalablement crée
-		* @param margeErreur 	: Marge d'erreur permise entre 2 distances d'une même série
-		* @param angleMax 		: Angle maximum que peut prendre une série de 3 points
-		* @param troisD 		: boolean spécifiant si les distances sont gérés en troisD ou non
+	/** Param�tres
+		* @param graph 			: Graphe repr�sentant le fichier de point dont les arr�tes ont été préalablement crée
+		* @param margeErreur 	: Marge d'erreur permise entre 2 distances d'une m�me s�rie
+		* @param angleMax 		: Angle maximum que peut prendre une s�rie de 3 points
+		* @param troisD 		: boolean sp�cifiant si les distances sont g�r�s en troisD ou non
 	**/
 	//TODO voir ce qu'il se passe avec une gestion d'angle en troisD lorsque le paramètre troisD est à true.
 	//TODO ajouter la création d'arrête dans l'algo et le paramètre de seuil distance dans celui ci.

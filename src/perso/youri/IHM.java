@@ -12,8 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -22,23 +20,23 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.text.View;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.graphstream.stream.file.FileSinkDGS;
 import org.graphstream.stream.file.FileSinkImages;
 import org.graphstream.stream.file.FileSinkImages.OutputType;
 import org.graphstream.stream.file.FileSinkImages.Resolutions;
 import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
+
 import org.json.JSONException;
 
-public class IHM extends JFrame implements ActionListener{
+public class IHM extends JFrame implements ActionListener, ChangeListener{
 
 	/****************/
 	/** Attributes **/
@@ -46,24 +44,27 @@ public class IHM extends JFrame implements ActionListener{
 	private final static int SCREEN_W = 1000;
 	private final static int SCREEN_H = 800;
 	// IHM
-	private JPanel generalPan, northPan, topNorthPan, bottomNorthPan, centerPan, eastPan;
-	private JButton fichier, analyserAfficher, effacer, image, trajectoire, help;
-	private JLabel infoAffAn;
+	private JPanel generalPan, northPan, topNorthPan, bottomNorthPan, bottomNorthPanNorth, bottomNorthPanSouth, centerPan, eastPan;
+	private JButton fichier, afficher, analyser, effacer, image, trajectoire, help;
+	private JLabel infoBtnFiles, infoSlider;
 	private JTextField jtf;
 	private String pathFileSelected, nameFileSelected, fileTypeSelected;
 	// Fichier / Dossier
 	private FileDialog open;
 	// Viewer
-	private Graph graph;
 	private Viewer viewer;
     private ViewPanel view;
-    // Loader
-    private Loader loader;
+    private static boolean isAfficher = false;
+    private static boolean isAnalyser = false;
     // Graph loaded
     private Graph graphLoaded;
     // Algo
-    private Bubulle algoGatien;
-	
+    private Bubulle algo;
+    // Slider
+    JSlider slider;
+    private static double sliderPercent = 1.;
+    private static double sliderTmpCpt = 0;
+
 	/******************/
 	/** Constructeur **/
 	/******************/
@@ -77,6 +78,8 @@ public class IHM extends JFrame implements ActionListener{
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((dim.width/2 - this.getWidth())/2, (dim.height/4 - this.getHeight())/2);
 		
+		// Initialisation des strings
+		pathFileSelected = ""; nameFileSelected = ""; fileTypeSelected = "";
 		/************************************************/
 		generalPan = new JPanel();
 		generalPan.setLayout(new BorderLayout());
@@ -84,23 +87,34 @@ public class IHM extends JFrame implements ActionListener{
 		// Panneau du haut
 		northPan = new JPanel();
 		northPan.setLayout(new BorderLayout());
-		
+
 		topNorthPan = new JPanel();
 		topNorthPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Choix du fichier txt"));
 		bottomNorthPan = new JPanel();
+		bottomNorthPan.setLayout(new BorderLayout());
 		bottomNorthPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Informations"));
 
 		fichier = new JButton("Fichier");
 		fichier.addActionListener(this);
 		jtf = new JTextField(50);
-		analyserAfficher = new JButton("Analyser et Afficher");
-		analyserAfficher.addActionListener(this);
-		infoAffAn = new JLabel(" ");
+		jtf.setEnabled(false);
+		afficher = new JButton("Afficher");
+		afficher.addActionListener(this);
+		analyser = new JButton("Analyser");
+		analyser.addActionListener(this);
+		infoBtnFiles = new JLabel(" ");
+		infoSlider = new JLabel(" ");
 		
 		topNorthPan.add(fichier);
 		topNorthPan.add(jtf);
-		topNorthPan.add(analyserAfficher);
-		bottomNorthPan.add(infoAffAn);
+		topNorthPan.add(afficher);
+		topNorthPan.add(analyser);
+		bottomNorthPanNorth = new JPanel();
+		bottomNorthPanSouth = new JPanel();
+		bottomNorthPanNorth.add(infoBtnFiles);
+		bottomNorthPanSouth.add(infoSlider);
+		bottomNorthPan.add(bottomNorthPanNorth,BorderLayout.NORTH);
+		bottomNorthPan.add(bottomNorthPanSouth,BorderLayout.SOUTH);
 		
 		northPan.add(topNorthPan, BorderLayout.NORTH);
 		northPan.add(bottomNorthPan, BorderLayout.SOUTH);
@@ -109,8 +123,7 @@ public class IHM extends JFrame implements ActionListener{
 		// Panneau central
 		centerPan = new JPanel();
 		centerPan.setLayout(new BorderLayout());
-		centerPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Affichage"));
-		//centerPan.add(view, BorderLayout.CENTER);
+		centerPan.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK),"Affichage"));	
 		generalPan.add(centerPan, BorderLayout.CENTER);
 		
 		// Panneau de droite
@@ -154,13 +167,14 @@ public class IHM extends JFrame implements ActionListener{
 		if(e.getSource() == fichier) {
 			if(jtf.getText() != "") {
 				jtf.setText("");
-				infoAffAn.setText(" ");
+				infoBtnFiles.setText(" ");
+				infoSlider.setText("");
 			}
 			
 			open = new FileDialog(this);
 			open.setVisible(true);
 			pathFileSelected = open.getDirectory()+open.getFile();
-
+			
 			// Obtention du nom du fichier
 			int lastIndex = 0;
 			
@@ -180,40 +194,71 @@ public class IHM extends JFrame implements ActionListener{
 				jtf.setText("");
 			else
 				jtf.setText(nameFileSelected+fileTypeSelected);
-
-			//graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
-			//displayGraph(graphLoaded);
+			
+			this.isAfficher = false;
+			this.isAnalyser = false;
 		}
 		
-		// Action bouton analyserAfficher
-		if(e.getSource() == analyserAfficher) {
-			// Si le type du fichier est bon
-			if(fileTypeSelected.equals(".txt")) {
-				graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
-				try {
-					algoGatien = new Bubulle(graphLoaded);
-				} catch (JSONException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}				
-				displayGraph(algoGatien.getGraph());
-				
-				infoAffAn.setForeground(Color.BLACK);
-				infoAffAn.setText("Le fichier a bien été analysé.");
+		// Action bouton Afficher
+		if(e.getSource() == afficher) {
+			if(!jtf.getText().equals("") && !isAfficher) {
+				if(!fileTypeSelected.equals("null")) {
+					// Si le type du fichier est bon
+					if(fileTypeSelected.equals(".txt")) {
+						graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
+						displayGraph(graphLoaded);
+						createSlider();
+						resetSlider();
+						isAfficher = true;
+						
+						infoBtnFiles.setForeground(Color.BLACK);
+						infoBtnFiles.setText("Affichage du graph lié au fichier choisi.");
+						infoSlider.setText("Vous pouvez zoomer sur le graph grâce au slider sur le côté. Pour vous déplacer, cliquez sur le graph puis utilisez les flèches du clavier.");
+					}
+					else {
+						infoBtnFiles.setForeground(Color.RED);
+						infoBtnFiles.setText("Erreur : Le type du fichier n'est pas un .txt !");
+					}
+					isAnalyser = false;
+				}
 			}
-			else {
-				infoAffAn.setForeground(Color.RED);
-				infoAffAn.setText("Erreur : Le type du fichier n'est pas un .txt !");
+		}
+		
+		// Action bouton analyser
+		if(e.getSource() == analyser) {
+			if(!jtf.getText().equals("") && !isAnalyser) {
+				if(!fileTypeSelected.equals("null")) {
+					// Si le type du fichier est bon
+					if(fileTypeSelected.equals(".txt")) {
+						graphLoaded = new Loader(pathFileSelected).loadGraph("graph");
+						
+						try {
+							algo = new Bubulle(graphLoaded);
+						} catch (JSONException e1) {e1.printStackTrace();}
+						  catch (IOException e1) {e1.printStackTrace();}
+										
+						displayGraph(algo.getGraph());
+						createSlider();
+						resetSlider();
+						isAnalyser = true;
+	
+						infoBtnFiles.setForeground(Color.BLACK);
+						infoBtnFiles.setText("Le fichier a bien été analysé.");
+						infoSlider.setText("Vous pouvez zoomer sur le graph grâce au slider sur le côté. Pour vous déplacer, cliquez sur le graph puis utilisez les flèches du clavier.");
+					}
+					else {
+						infoBtnFiles.setForeground(Color.RED);
+						infoBtnFiles.setText("Erreur : Le type du fichier n'est pas un .txt !");
+					}
+					isAfficher = false;
+				}
 			}
 		}
 		/***********************/
 		/* Boutons des Options */
 		/***********************/
-		if(e.getSource() == trajectoire) {
-			
+		// Crée un fichier contenant les trajectoires trouvées
+		if(e.getSource() == trajectoire) {			
 			// Ouvrir une boite de dialogue
 			if(viewer != null) {
 				open = new FileDialog(this, "Sauvegardez les trajectoires dans un fichier txt", FileDialog.SAVE);
@@ -224,11 +269,12 @@ public class IHM extends JFrame implements ActionListener{
 				if(!fileTypeSelected.equals("."))
 					pathFileSelected = open.getDirectory()+open.getFile()+".txt";
 				
-				algoGatien.getTrajectoire(pathFileSelected);
-				
+				algo.getTrajectoire(pathFileSelected);
+				infoBtnFiles.setText("Le fichier txt des trajectoires a bien été crée.");
 			}			
 		}
 		
+		// Prend un screenshot de l'affichage du graph
 		if(e.getSource() == image) {
 			if(viewer != null){
 				open = new FileDialog(this, "Sauvegardez votre image", FileDialog.SAVE);
@@ -248,7 +294,8 @@ public class IHM extends JFrame implements ActionListener{
 				try {
 					pic.writeAll(getGraphLoaded(), pathFileSelected);
 				} catch (IOException e1) {e1.printStackTrace();}
-			
+				
+				infoBtnFiles.setText("L'image du graph a bien été créée.");
 			}
 		}
 
@@ -258,8 +305,12 @@ public class IHM extends JFrame implements ActionListener{
 				viewer.close();
 				centerPan.repaint();
 				jtf.setText("");
-				infoAffAn.setText("L'affichage a bien été effacé.");
+				infoBtnFiles.setText("L'affichage a bien été effacé.");
+				infoSlider.setText("");
 				this.view = null;
+				this.viewer = null;
+				this.isAfficher = false;
+				this.isAnalyser = false;
 			}
 		}
 		
@@ -268,10 +319,12 @@ public class IHM extends JFrame implements ActionListener{
 			JFrame help = new JFrame("Aide");
 			JPanel helpPan = new JPanel(new FlowLayout());
 
-			help.setPreferredSize(new Dimension(800,500));
+			help.setPreferredSize(new Dimension(800,575));
 			help.setLayout(new BorderLayout());
 			
 			StringBuilder strB = new StringBuilder();
+			String strSave = null;
+			
 			try (BufferedReader br = new BufferedReader(new FileReader("data/README.txt"))) {
 	        	String strLine;
 	        	
@@ -279,10 +332,45 @@ public class IHM extends JFrame implements ActionListener{
 	        		strB.append(strLine+"\n");
 	        	}
 	        	br.close();	
-	        } catch (IOException e1) {e1.printStackTrace();}
+	        } catch (IOException e1) {e1.printStackTrace();
+			
+				strSave = "Bonjour et bienvenue dans l'Aide !\n\n"+
+
+				"Utilisation :\n"+
+					"\t- Sélectionnez un fichier .txt grâce au bouton \"Fichier\".\n"+
+					"\t- Apparition du nom du fichier sélectionné.\n"+
+					"\t- Affichez ce fichier grâce au bouton \"Afficher\".\n"+
+					"\t- Analysez ce fichier grâce au bouton \"Analyser\".\n\n"+
+				
+				"Informations :\n"+
+					"\tDes informations concernant vos actions seront affichées dans la partie \"Informations\".\n\n"+
+				
+				"Affichage :\n"+
+					"\tPermet l'affichage du graph une fois analysé.\n"+
+					"\tUtilisez le slider sur le côté pour Zoomer.\n"+
+					"\tPour vous déplacer dans la graph, cliquez dessus puis utilisez les flèches du clavier.\n\n"+
+				
+				"Options :\n"+
+					"\tBouton Trajectoire :\n"+
+						"\t\tPermet de générer un fichier .txt du résultat des trajectoires trouvées.\n"+
+						"\t\tOuvrir ensuite ce fichier avec un éditeur de texte autre que le bloc note\n"+
+						"\t\tafin d'obtenir une bonne indentation.\n"+
+					"\tBouton Screenshot :\n"+
+						"\t\tPermet de générer une image png (par défaut) du graph résultat.\n"+
+					"\tBouton Effacer :\n"+
+						"\t\tPermet d'effacer l'affichage du graph.\n"+
+					"\tBouton Aide :\n"+
+						"\t\tPermet d'ouvrir une fenêtre d'aide. Ce contenu est disponible également\n"+
+						"\t\tdans un fichier README.txt.\n"+					
+														"\t\t\t\t\t\t\t\t\t\tBy youyou.";
+	        }
 			
 			JTextArea infos = new JTextArea();
-			infos.setText(strB.toString());
+			// Si le fichier README n'est pas trouvable, l'aide va s'afficher quand même
+			if(strSave != null)
+				infos.setText(strSave.toString());
+			else
+				infos.setText(strB.toString());
 			infos.setEditable(false);
 			infos.setBackground(null);
 			
@@ -293,42 +381,36 @@ public class IHM extends JFrame implements ActionListener{
 		}
 	}
 	
-	/**************************************/
-	/** Méthode de convertion txt to dgs **/
-	/**************************************/
-	public static void txtToGsd(String pathFileName, String fileName) throws IOException{
-		Graph graphconverter = new SingleGraph("");
+	/*****************/
+	/* Action Slider */
+	/*****************/
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		JSlider source = (JSlider) e.getSource();
+		int cpt = (int)source.getValue();
 		
-        String basicFile = pathFileName;
-        String line = "";
-        String cvsSplitBy = "   ";
-
-        try (BufferedReader br = new BufferedReader(new FileReader(basicFile))) {
-        	int counter = 1;
-            while ((line = br.readLine()) != null) {
-                String[] buble = line.split(cvsSplitBy);
-
-                double x = Double.valueOf(buble[1]).doubleValue();
-                double y = Double.valueOf(buble[2]).doubleValue();
-                double z = Double.valueOf(buble[3]).doubleValue();
-                double col4 = Double.valueOf(buble[4]).doubleValue(); //modifier nom
-                double col5 = Double.valueOf(buble[5]).doubleValue(); //modifier nom
-                
-                Node node = graphconverter.addNode("B"+counter);
-                node.setAttribute("xyz", x, y, z);
-                node.setAttribute("col4", col4);
-                node.setAttribute("col5", col5);
-                counter++;
-            }
-
-        } catch (IOException e) {e.printStackTrace();}
-        
-        //graphconverter.write(getSworkspace()+"/workspace/data/"+fileName+".dgs");
+		if(cpt == 0) {
+			resetSlider();
+		}
+		// Zoom
+		if(cpt > 0 && cpt > sliderTmpCpt && sliderPercent >= 0) {
+			view.getCamera().setViewPercent(sliderPercent-0.2);
+			sliderPercent -= 0.2;
+		}
+		// Dézoom
+		if(cpt > 0 && cpt < sliderTmpCpt && sliderPercent <= 1) {
+			view.getCamera().setViewPercent(sliderPercent+0.2);
+			sliderPercent += 0.2;
+		}			
+		sliderTmpCpt = cpt;
+		System.out.println("cpt : " + cpt);
+		System.out.println("sliderTmp : " + sliderTmpCpt);
+		System.out.println("pourcent : " + sliderPercent);
 	}
 	
-	/*******************/
-	/** Code du graph **/
-	/*******************/
+	/************************/
+	/** Affichage du graph **/
+	/************************/
 	public void displayGraph(Graph graph) {
 		// Permet de générer le graph dans l'IHM directement
 		if(view != null) {
@@ -340,22 +422,36 @@ public class IHM extends JFrame implements ActionListener{
 		else {
 			viewer = new Viewer(graph,Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
 			view = (ViewPanel) viewer.addDefaultView(false);
-		}
-		
-		/* Autre moyen
-		 * viewer = graph.display();
-		 * view = viewer.getDefaultView();
-		 * */
-		//viewer.enableAutoLayout();
-		//view.setEnabled(true);
+		}		
 		this.centerPan.add(view, BorderLayout.CENTER);
-		
 	}
 	
 	/***************/
 	/** GET / SET **/
 	/***************/
 	public Graph getGraphLoaded(){return this.graphLoaded;}
+	
+	/*************/
+	/* Fonctions */
+	/*************/
+	public void createSlider() {
+		slider = new JSlider(JSlider.VERTICAL,0,5,0);
+		slider.addChangeListener(this);
+		slider.setMajorTickSpacing(5);
+		slider.setMinorTickSpacing(1);
+		slider.setPaintTicks(false);
+		slider.setPaintLabels(true);
+		slider.setLabelTable(slider.createStandardLabels(1));
+		
+		centerPan.add(slider, BorderLayout.EAST);
+	}
+	public void resetSlider() {
+		view.getCamera().resetView();
+		sliderPercent = 1;
+		sliderTmpCpt = 0;
+		slider = null;
+	}
+	
 	
 	/*************************************/
 	/** Lancement du programme sécurisé **/

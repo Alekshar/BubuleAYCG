@@ -1,10 +1,11 @@
 package perso.youri;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.vecmath.Vector2d;
-import javax.vecmath.Vector3d;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
@@ -66,5 +67,14 @@ public final class ProcessUtils {
 	    } finally {
 	        reader.close();
 	    }
+	}
+	
+	public static void printToFile(String path, String text) throws FileNotFoundException{
+		PrintWriter out = new PrintWriter(path);
+		try{
+			out.print(text);
+		} finally {
+			out.close();
+		}
 	}
 }

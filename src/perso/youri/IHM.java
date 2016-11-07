@@ -223,8 +223,8 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 		}
 
 		// Action bouton Afficher
-		if (e.getSource() == afficher) {System.out.println("zboub");
-			if (!jtf.getText().equals("") && !isAfficher) {
+		if (e.getSource() == afficher) {
+			if (!jtf.getText().equals("") && !isAfficher) { 
 				if (!fileTypeSelected.equals("null")) {
 					// Si le type du fichier est bon
 					if (fileTypeSelected.equals(".txt")) {
@@ -492,7 +492,8 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 		return this.graphLoaded;
 	}
 	public void setIsConfig(boolean aff) {
-		this.isConfigChange = aff;
+		this.isAnalyser = aff;
+		this.isConfigChange = true;
 	}
 
 	/*************/

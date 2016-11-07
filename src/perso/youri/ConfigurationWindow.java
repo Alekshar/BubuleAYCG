@@ -356,7 +356,7 @@ public class ConfigurationWindow {
 					ProcessUtils.printToFile("conf/configuration2.json",
 							jobj.toString());
 					
-					frame.setIsConfig(true);
+					frame.setIsConfig(false);
 					
 					frmConfiguration.dispose();
 				} catch (JSONException e) {

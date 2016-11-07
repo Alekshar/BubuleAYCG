@@ -35,8 +35,6 @@ import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.Viewer;
 import org.json.JSONException;
 
-import perso.alexandre.ConfigurationWindow;
-
 public class IHM extends JFrame implements ActionListener, ChangeListener {
 
 	/****************/
@@ -59,6 +57,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	private ViewPanel view;
 	private static boolean isAfficher = false;
 	private static boolean isAnalyser = false;
+	private static boolean isConfigChange = false;
 	// Graph loaded
 	private Graph graphLoaded;
 	// Algo
@@ -67,6 +66,8 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	JSlider slider;
 	private static double sliderPercent = 1.;
 	private static double sliderTmpCpt = 0;
+	
+	private static String OS = System.getProperty("os.name").toLowerCase();
 
 	/******************/
 	/** Constructeur **/
@@ -77,7 +78,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 		// setExtendedState(Frame.MAXIMIZED_BOTH);
 		this.setLayout(new BorderLayout());
 
-		// Positionne la fenêtre au milieu de l'écran
+		// Positionne la fenetre au milieu de l'ecran
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		this.setLocation((dim.width / 2 - this.getWidth()) / 2,
 				(dim.height / 4 - this.getHeight()) / 2);
@@ -194,19 +195,21 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			// Obtention du nom du fichier
 			int lastIndex = 0;
 
-			// Lien Windows
-			lastIndex = pathFileSelected.lastIndexOf("\\");
-			nameFileSelected = pathFileSelected.substring(lastIndex + 1,
-					pathFileSelected.length() - 4);
-			fileTypeSelected = pathFileSelected.substring(
-					pathFileSelected.length() - 4, pathFileSelected.length());
-
-			// Lien Linux
-			// lastIndex = pathFileSelected.lastIndexOf("/");
-			// nameFileSelected = pathFileSelected.substring(lastIndex+1,
-			// pathFileSelected.length()-4);
-
-			// Si on ouvre la fenêtre de recherche de fichier
+			if(isWindows()) {
+				// Lien Windows
+				lastIndex = pathFileSelected.lastIndexOf("\\");
+				nameFileSelected = pathFileSelected.substring(lastIndex + 1, pathFileSelected.length() - 4);
+				fileTypeSelected = pathFileSelected.substring(pathFileSelected.length() - 4, pathFileSelected.length());
+			}
+			
+			if(isLinux()) {
+				// Lien Linux
+				lastIndex = pathFileSelected.lastIndexOf("/");
+				nameFileSelected = pathFileSelected.substring(lastIndex+1, pathFileSelected.length()-4);
+				fileTypeSelected = pathFileSelected.substring(pathFileSelected.length() - 4, pathFileSelected.length());
+			}
+			
+			// Si on ouvre la fenetre de recherche de fichier
 			// mais que finalement on ne choisit rien
 			// on supprime le message d'erreur
 			if (pathFileSelected.equals("nullnull"))
@@ -220,7 +223,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 		}
 
 		// Action bouton Afficher
-		if (e.getSource() == afficher) {
+		if (e.getSource() == afficher) {System.out.println("zboub");
 			if (!jtf.getText().equals("") && !isAfficher) {
 				if (!fileTypeSelected.equals("null")) {
 					// Si le type du fichier est bon
@@ -234,15 +237,15 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 
 						infoBtnFiles.setForeground(Color.BLACK);
 						infoBtnFiles
-								.setText("Affichage du graph lié au fichier choisi.");
+								.setText("Affichage du graph li\u00e9 au fichier choisi.");
 						infoSlider
-								.setText("Vous pouvez zoomer sur le graph grâce au slider sur le côté. Pour vous déplacer, cliquez sur le graph puis utilisez les flèches du clavier.");
+								.setText("Vous pouvez zoomer sur le graph gr\u00e2ce au slider sur le c\u00f4t\u00e9. Pour vous d\u00e9placer, cliquez sur le graph puis utilisez les fl\u00e8ches du clavier.");
 					} else {
 						infoBtnFiles.setForeground(Color.RED);
 						infoBtnFiles
 								.setText("Erreur : Le type du fichier n'est pas un .txt !");
 					}
-					isAnalyser = false;
+					isAnalyser = false; 
 				}
 			}
 		}
@@ -270,9 +273,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 						isAnalyser = true;
 
 						infoBtnFiles.setForeground(Color.BLACK);
-						infoBtnFiles.setText("Le fichier a bien été analysé.");
+						infoBtnFiles.setText("Le fichier a bien \u00e9t\u00e9 analys\u00e9.");
 						infoSlider
-								.setText("Vous pouvez zoomer sur le graph grâce au slider sur le côté. Pour vous déplacer, cliquez sur le graph puis utilisez les flèches du clavier.");
+								.setText("Vous pouvez zoomer sur le graph gr\u00e2ce au slider sur le c\u00f4t\u00e9. Pour vous d\u00e9placer, cliquez sur le graph puis utilisez les fl\u00e8ches du clavier.");
 					} else {
 						infoBtnFiles.setForeground(Color.RED);
 						infoBtnFiles
@@ -285,7 +288,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 		/***********************/
 		/* Boutons des Options */
 		/***********************/
-		// Crée un fichier contenant les trajectoires trouvées
+		// Cree un fichier contenant les trajectoires trouvees
 		if (e.getSource() == trajectoire) {
 			// Ouvrir une boite de dialogue
 			if (viewer != null) {
@@ -304,7 +307,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 
 				algo.getTrajectoire(pathFileSelected);
 				infoBtnFiles
-						.setText("Le fichier txt des trajectoires a bien été crée.");
+						.setText("Le fichier txt des trajectoires a bien \u00e9t\u00e9 cr\u00e9e.");
 			}
 		}
 
@@ -325,7 +328,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 							+ ".png";
 
 				/*
-				 * Autre méthode sans utiliser le FileSinkImages
+				 * Autre methode sans utiliser le FileSinkImages
 				 * this.getGraphLoaded().addAttribute("ui.screenshot",
 				 * pathFileSelected);
 				 */
@@ -338,7 +341,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 					e1.printStackTrace();
 				}
 
-				infoBtnFiles.setText("L'image du graph a bien été créée.");
+				infoBtnFiles.setText("L'image du graph a bien \u00e9t\u00e9 cr\u00e9\u00e9e.");
 			}
 		}
 
@@ -348,7 +351,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 				viewer.close();
 				centerPan.repaint();
 				jtf.setText("");
-				infoBtnFiles.setText("L'affichage a bien été effacé.");
+				infoBtnFiles.setText("L'affichage a bien \u00e9t\u00e9 effac\u00e9.");
 				infoSlider.setText("");
 				this.view = null;
 				this.viewer = null;
@@ -362,13 +365,13 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			JFrame help = new JFrame("Aide");
 			JPanel helpPan = new JPanel(new FlowLayout());
 
-			help.setPreferredSize(new Dimension(800, 575));
+			help.setPreferredSize(new Dimension(800, 620));
 			help.setLayout(new BorderLayout());
 
 			StringBuilder strB = new StringBuilder();
 			String strSave = null;
 
-			try (BufferedReader br = new BufferedReader(new FileReader(
+			/*try (BufferedReader br = new BufferedReader(new FileReader(
 					"data/README.txt"))) {
 				String strLine;
 
@@ -377,46 +380,46 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 				}
 				br.close();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				e1.printStackTrace();*/
 
 				strSave = "Bonjour et bienvenue dans l'Aide !\n\n"
 						+
 
 						"Utilisation :\n"
-						+ "\t- Sélectionnez un fichier .txt grâce au bouton \"Fichier\".\n"
-						+ "\t- Apparition du nom du fichier sélectionné.\n"
-						+ "\t- Affichez ce fichier grâce au bouton \"Afficher\".\n"
-						+ "\t- Analysez ce fichier grâce au bouton \"Analyser\".\n\n"
+						+ "\t- S\u00e9lectionnez un fichier .txt gr\u00e2ce au bouton \"Fichier\".\n"
+						+ "\t- Apparition du nom du fichier s\u00e9lectionn\u00e9.\n"
+						+ "\t- Affichez ce fichier gr\u00e2ce au bouton \"Afficher\".\n"
+						+ "\t- Analysez ce fichier gr\u00e2ce au bouton \"Analyser\".\n\n"
 						+
 
 						"Informations :\n"
-						+ "\tDes informations concernant vos actions seront affichées dans la partie \"Informations\".\n\n"
+						+ "\tDes informations concernant vos actions seront affich\u00e9es dans la partie \"Informations\".\n\n"
 						+
 
 						"Affichage :\n"
-						+ "\tPermet l'affichage du graph une fois analysé.\n"
-						+ "\tUtilisez le slider sur le côté pour Zoomer.\n"
-						+ "\tPour vous déplacer dans la graph, cliquez dessus puis utilisez les flèches du clavier.\n\n"
+						+ "\tPermet l'affichage du graph une fois analys\u00e9.\n"
+						+ "\tUtilisez le slider sur le c\u00f4t\u00e9 pour Zoomer.\n"
+						+ "\tPour vous d\u00e9placer dans la graph, cliquez dessus puis utilisez les fl\u00e8ches du clavier.\n\n"
 						+
 
 						"Options :\n"
 						+ "\tBouton Trajectoire :\n"
-						+ "\t\tPermet de générer un fichier .txt du résultat des trajectoires trouvées.\n"
-						+ "\t\tOuvrir ensuite ce fichier avec un éditeur de texte autre que le bloc note\n"
+						+ "\t\tPermet de g\u00e9n\u00e9rer un fichier .txt du r\u00e9sultat des trajectoires trouv\u00e9es.\n"
+						+ "\t\tOuvrir ensuite ce fichier avec un \u00e9diteur de texte autre que le bloc note\n"
 						+ "\t\tafin d'obtenir une bonne indentation.\n"
 						+ "\tBouton Screenshot :\n"
-						+ "\t\tPermet de générer une image png (par défaut) du graph résultat.\n"
+						+ "\t\tPermet de g\u00e9n\u00e9rer une image png (par d\u00e9faut) du graph r\u00e9sultat.\n"
 						+ "\tBouton Effacer :\n"
 						+ "\t\tPermet d'effacer l'affichage du graph.\n"
 						+ "\tBouton Aide :\n"
-						+ "\t\tPermet d'ouvrir une fenêtre d'aide. Ce contenu est disponible également\n"
+						+ "\t\tPermet d'ouvrir une fen\u00eatre d'aide. Ce contenu est disponible \u00e9galement\n"
 						+ "\t\tdans un fichier README.txt.\n"
 						+ "\t\t\t\t\t\t\t\t\t\tBy youyou.";
-			}
+			//}
 
 			JTextArea infos = new JTextArea();
 			// Si le fichier README n'est pas trouvable, l'aide va s'afficher
-			// quand même
+			// quand meme
 			if (strSave != null)
 				infos.setText(strSave.toString());
 			else
@@ -455,7 +458,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			view.getCamera().setViewPercent(sliderPercent - 0.2);
 			sliderPercent -= 0.2;
 		}
-		// Dézoom
+		// Dï¿½zoom
 		if (cpt > 0 && cpt < sliderTmpCpt && sliderPercent <= 1) {
 			view.getCamera().setViewPercent(sliderPercent + 0.2);
 			sliderPercent += 0.2;
@@ -467,7 +470,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	/** Affichage du graph **/
 	/************************/
 	public void displayGraph(Graph graph) {
-		// Permet de générer le graph dans l'IHM directement
+		// Permet de generer le graph dans l'IHM directement
 		if (view != null) {
 			viewer.close();
 			viewer = new Viewer(graph,
@@ -487,6 +490,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	/***************/
 	public Graph getGraphLoaded() {
 		return this.graphLoaded;
+	}
+	public void setIsConfig(boolean aff) {
+		this.isConfigChange = aff;
 	}
 
 	/*************/
@@ -511,12 +517,19 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 		slider = null;
 	}
 
+	public static boolean isWindows() {
+		return (OS.indexOf("win") >= 0);
+	}
+	
+	public static boolean isLinux() {
+		return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0);
+	}
 	/*************************************/
-	/** Lancement du programme sécurisé **/
+	/** Lancement du programme securise **/
 	/*************************************/
 	public static void createAndShowGUI() {
 
-		// Permet d'utiliser l'apparence du système en général
+		// Permet d'utiliser l'apparence du systeme en general
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {

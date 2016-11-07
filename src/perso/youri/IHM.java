@@ -256,6 +256,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 				if (!fileTypeSelected.equals("null")) {
 					// Si le type du fichier est bon
 					if (fileTypeSelected.equals(".txt")) {
+						isAnalyser = true;
 						graphLoaded = new Loader(pathFileSelected)
 								.loadGraph("graph");
 
@@ -270,7 +271,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 						displayGraph(algo.getGraph());
 						createSlider();
 						resetSlider();
-						isAnalyser = true;
+						isAnalyser = false;
 
 						infoBtnFiles.setForeground(Color.BLACK);
 						infoBtnFiles.setText("Le fichier a bien \u00e9t\u00e9 analys\u00e9.");

@@ -510,10 +510,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	}
 
 	public void resetSlider() {
-		view.getCamera().resetView();
 		sliderPercent = 1;
 		sliderTmpCpt = 0;
-		slider = null;
+		slider.setValue(0);
 	}
 
 	public static boolean isWindows() {

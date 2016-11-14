@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
@@ -36,7 +34,7 @@ import org.graphstream.ui.view.Viewer;
 import org.json.JSONException;
 
 public class IHM extends JFrame implements ActionListener, ChangeListener {
-
+	private static final long serialVersionUID = 2929364546054924454L;
 	/****************/
 	/** Attributes **/
 	/****************/
@@ -55,9 +53,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	// Viewer
 	private Viewer viewer;
 	private ViewPanel view;
-	private static boolean isAfficher = false;
-	private static boolean isAnalyser = false;
-	private static boolean isConfigChange = false;
+	// private static boolean isAfficher = false;
+	// private static boolean isAnalyser = false;
+	// private static boolean isConfigChange = false;
 	// Graph loaded
 	private Graph graphLoaded;
 	// Algo
@@ -66,7 +64,7 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	JSlider slider;
 	private static double sliderPercent = 1.;
 	private static double sliderTmpCpt = 0;
-	
+
 	private static String OS = System.getProperty("os.name").toLowerCase();
 
 	/******************/
@@ -195,20 +193,26 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			// Obtention du nom du fichier
 			int lastIndex = 0;
 
-			if(isWindows()) {
+			if (isWindows()) {
 				// Lien Windows
 				lastIndex = pathFileSelected.lastIndexOf("\\");
-				nameFileSelected = pathFileSelected.substring(lastIndex + 1, pathFileSelected.length() - 4);
-				fileTypeSelected = pathFileSelected.substring(pathFileSelected.length() - 4, pathFileSelected.length());
+				nameFileSelected = pathFileSelected.substring(lastIndex + 1,
+						pathFileSelected.length() - 4);
+				fileTypeSelected = pathFileSelected.substring(
+						pathFileSelected.length() - 4,
+						pathFileSelected.length());
 			}
-			
-			if(isLinux()) {
+
+			if (isLinux()) {
 				// Lien Linux
 				lastIndex = pathFileSelected.lastIndexOf("/");
-				nameFileSelected = pathFileSelected.substring(lastIndex+1, pathFileSelected.length()-4);
-				fileTypeSelected = pathFileSelected.substring(pathFileSelected.length() - 4, pathFileSelected.length());
+				nameFileSelected = pathFileSelected.substring(lastIndex + 1,
+						pathFileSelected.length() - 4);
+				fileTypeSelected = pathFileSelected.substring(
+						pathFileSelected.length() - 4,
+						pathFileSelected.length());
 			}
-			
+
 			// Si on ouvre la fenetre de recherche de fichier
 			// mais que finalement on ne choisit rien
 			// on supprime le message d'erreur
@@ -217,14 +221,12 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			else
 				jtf.setText(nameFileSelected + fileTypeSelected);
 
-			isAfficher = false;
-			isAnalyser = false;
 			afficher.doClick();
 		}
 
 		// Action bouton Afficher
 		if (e.getSource() == afficher) {
-			if (!jtf.getText().equals("") && !isAfficher) { 
+			if (!jtf.getText().equals("")) {
 				if (!fileTypeSelected.equals("null")) {
 					// Si le type du fichier est bon
 					if (fileTypeSelected.equals(".txt")) {
@@ -233,7 +235,6 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 						displayGraph(graphLoaded);
 						createSlider();
 						resetSlider();
-						isAfficher = true;
 
 						infoBtnFiles.setForeground(Color.BLACK);
 						infoBtnFiles
@@ -245,18 +246,16 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 						infoBtnFiles
 								.setText("Erreur : Le type du fichier n'est pas un .txt !");
 					}
-					isAnalyser = false; 
 				}
 			}
 		}
 
 		// Action bouton analyser
 		if (e.getSource() == analyser) {
-			if (!jtf.getText().equals("") && !isAnalyser) {
+			if (!jtf.getText().equals("")) {
 				if (!fileTypeSelected.equals("null")) {
 					// Si le type du fichier est bon
 					if (fileTypeSelected.equals(".txt")) {
-						isAnalyser = true;
 						graphLoaded = new Loader(pathFileSelected)
 								.loadGraph("graph");
 
@@ -271,10 +270,12 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 						displayGraph(algo.getGraph());
 						createSlider();
 						resetSlider();
-						isAnalyser = false;
+
+						this.revalidate();
 
 						infoBtnFiles.setForeground(Color.BLACK);
-						infoBtnFiles.setText("Le fichier a bien \u00e9t\u00e9 analys\u00e9.");
+						infoBtnFiles
+								.setText("Le fichier a bien \u00e9t\u00e9 analys\u00e9.");
 						infoSlider
 								.setText("Vous pouvez zoomer sur le graph gr\u00e2ce au slider sur le c\u00f4t\u00e9. Pour vous d\u00e9placer, cliquez sur le graph puis utilisez les fl\u00e8ches du clavier.");
 					} else {
@@ -282,7 +283,6 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 						infoBtnFiles
 								.setText("Erreur : Le type du fichier n'est pas un .txt !");
 					}
-					isAfficher = false;
 				}
 			}
 		}
@@ -342,7 +342,8 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 					e1.printStackTrace();
 				}
 
-				infoBtnFiles.setText("L'image du graph a bien \u00e9t\u00e9 cr\u00e9\u00e9e.");
+				infoBtnFiles
+						.setText("L'image du graph a bien \u00e9t\u00e9 cr\u00e9\u00e9e.");
 			}
 		}
 
@@ -352,12 +353,11 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 				viewer.close();
 				centerPan.repaint();
 				jtf.setText("");
-				infoBtnFiles.setText("L'affichage a bien \u00e9t\u00e9 effac\u00e9.");
+				infoBtnFiles
+						.setText("L'affichage a bien \u00e9t\u00e9 effac\u00e9.");
 				infoSlider.setText("");
 				this.view = null;
 				this.viewer = null;
-				isAfficher = false;
-				isAnalyser = false;
 			}
 		}
 
@@ -372,51 +372,49 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			StringBuilder strB = new StringBuilder();
 			String strSave = null;
 
-			/*try (BufferedReader br = new BufferedReader(new FileReader(
-					"data/README.txt"))) {
-				String strLine;
+			/*
+			 * try (BufferedReader br = new BufferedReader(new FileReader(
+			 * "data/README.txt"))) { String strLine;
+			 * 
+			 * while ((strLine = br.readLine()) != null) { strB.append(strLine +
+			 * "\n"); } br.close(); } catch (IOException e1) {
+			 * e1.printStackTrace();
+			 */
 
-				while ((strLine = br.readLine()) != null) {
-					strB.append(strLine + "\n");
-				}
-				br.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();*/
+			strSave = "Bonjour et bienvenue dans l'Aide !\n\n"
+					+
 
-				strSave = "Bonjour et bienvenue dans l'Aide !\n\n"
-						+
+					"Utilisation :\n"
+					+ "\t- S\u00e9lectionnez un fichier .txt gr\u00e2ce au bouton \"Fichier\".\n"
+					+ "\t- Apparition du nom du fichier s\u00e9lectionn\u00e9.\n"
+					+ "\t- Affichez ce fichier gr\u00e2ce au bouton \"Afficher\".\n"
+					+ "\t- Analysez ce fichier gr\u00e2ce au bouton \"Analyser\".\n\n"
+					+
 
-						"Utilisation :\n"
-						+ "\t- S\u00e9lectionnez un fichier .txt gr\u00e2ce au bouton \"Fichier\".\n"
-						+ "\t- Apparition du nom du fichier s\u00e9lectionn\u00e9.\n"
-						+ "\t- Affichez ce fichier gr\u00e2ce au bouton \"Afficher\".\n"
-						+ "\t- Analysez ce fichier gr\u00e2ce au bouton \"Analyser\".\n\n"
-						+
+					"Informations :\n"
+					+ "\tDes informations concernant vos actions seront affich\u00e9es dans la partie \"Informations\".\n\n"
+					+
 
-						"Informations :\n"
-						+ "\tDes informations concernant vos actions seront affich\u00e9es dans la partie \"Informations\".\n\n"
-						+
+					"Affichage :\n"
+					+ "\tPermet l'affichage du graph une fois analys\u00e9.\n"
+					+ "\tUtilisez le slider sur le c\u00f4t\u00e9 pour Zoomer.\n"
+					+ "\tPour vous d\u00e9placer dans la graph, cliquez dessus puis utilisez les fl\u00e8ches du clavier.\n\n"
+					+
 
-						"Affichage :\n"
-						+ "\tPermet l'affichage du graph une fois analys\u00e9.\n"
-						+ "\tUtilisez le slider sur le c\u00f4t\u00e9 pour Zoomer.\n"
-						+ "\tPour vous d\u00e9placer dans la graph, cliquez dessus puis utilisez les fl\u00e8ches du clavier.\n\n"
-						+
-
-						"Options :\n"
-						+ "\tBouton Trajectoire :\n"
-						+ "\t\tPermet de g\u00e9n\u00e9rer un fichier .txt du r\u00e9sultat des trajectoires trouv\u00e9es.\n"
-						+ "\t\tOuvrir ensuite ce fichier avec un \u00e9diteur de texte autre que le bloc note\n"
-						+ "\t\tafin d'obtenir une bonne indentation.\n"
-						+ "\tBouton Screenshot :\n"
-						+ "\t\tPermet de g\u00e9n\u00e9rer une image png (par d\u00e9faut) du graph r\u00e9sultat.\n"
-						+ "\tBouton Effacer :\n"
-						+ "\t\tPermet d'effacer l'affichage du graph.\n"
-						+ "\tBouton Aide :\n"
-						+ "\t\tPermet d'ouvrir une fen\u00eatre d'aide. Ce contenu est disponible \u00e9galement\n"
-						+ "\t\tdans un fichier README.txt.\n"
-						+ "\t\t\t\t\t\t\t\t\t\tBy youyou.";
-			//}
+					"Options :\n"
+					+ "\tBouton Trajectoire :\n"
+					+ "\t\tPermet de g\u00e9n\u00e9rer un fichier .txt du r\u00e9sultat des trajectoires trouv\u00e9es.\n"
+					+ "\t\tOuvrir ensuite ce fichier avec un \u00e9diteur de texte autre que le bloc note\n"
+					+ "\t\tafin d'obtenir une bonne indentation.\n"
+					+ "\tBouton Screenshot :\n"
+					+ "\t\tPermet de g\u00e9n\u00e9rer une image png (par d\u00e9faut) du graph r\u00e9sultat.\n"
+					+ "\tBouton Effacer :\n"
+					+ "\t\tPermet d'effacer l'affichage du graph.\n"
+					+ "\tBouton Aide :\n"
+					+ "\t\tPermet d'ouvrir une fen\u00eatre d'aide. Ce contenu est disponible \u00e9galement\n"
+					+ "\t\tdans un fichier README.txt.\n"
+					+ "\t\t\t\t\t\t\t\t\t\tBy youyou.";
+			// }
 
 			JTextArea infos = new JTextArea();
 			// Si le fichier README n'est pas trouvable, l'aide va s'afficher
@@ -492,10 +490,6 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	public Graph getGraphLoaded() {
 		return this.graphLoaded;
 	}
-	public void setIsConfig(boolean aff) {
-		this.isAnalyser = aff;
-		this.isConfigChange = true;
-	}
 
 	/*************/
 	/* Fonctions */
@@ -522,10 +516,12 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	public static boolean isWindows() {
 		return (OS.indexOf("win") >= 0);
 	}
-	
+
 	public static boolean isLinux() {
-		return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0);
+		return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS
+				.indexOf("aix") > 0);
 	}
+
 	/*************************************/
 	/** Lancement du programme securise **/
 	/*************************************/

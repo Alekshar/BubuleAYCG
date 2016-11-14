@@ -23,8 +23,6 @@ import javax.swing.border.TitledBorder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import perso.youri.ProcessUtils;
-
 public class ConfigurationWindow {
 
 	private JFrame frmConfiguration;
@@ -37,7 +35,6 @@ public class ConfigurationWindow {
 	private JSpinner spinMinAngle;
 	private JSpinner spinStepError;
 	private JSpinner spinMaxDist;
-	private IHM frame;
 
 	/**
 	 * Create the application.
@@ -48,7 +45,6 @@ public class ConfigurationWindow {
 	 * @throws JSONException
 	 */
 	public ConfigurationWindow(JFrame parent) throws JSONException, IOException {
-		frame = (IHM) parent;
 		initialize();
 		frmConfiguration.setLocationRelativeTo(parent);
 		setValues();
@@ -355,8 +351,6 @@ public class ConfigurationWindow {
 
 					ProcessUtils.printToFile("conf/configuration2.json",
 							jobj.toString());
-					
-					frame.setIsConfig(false);
 					
 					frmConfiguration.dispose();
 				} catch (JSONException e) {

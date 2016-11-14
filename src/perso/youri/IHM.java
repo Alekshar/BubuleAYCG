@@ -495,6 +495,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 	/* Fonctions */
 	/*************/
 	public void createSlider() {
+		if (slider != null) {
+			return;
+		}
 		slider = new JSlider(JSlider.VERTICAL, 0, 5, 0);
 		slider.addChangeListener(this);
 		slider.setMajorTickSpacing(5);

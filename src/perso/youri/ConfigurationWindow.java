@@ -83,14 +83,14 @@ public class ConfigurationWindow {
 	private void initialize() {
 		frmConfiguration = new JFrame();
 		frmConfiguration.setTitle("Configuration");
-		frmConfiguration.setBounds(0, 0, 268, 530);
+		frmConfiguration.setBounds(0, 0, 365, 530);
 		frmConfiguration.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frmConfiguration.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel spins = new JPanel();
 		frmConfiguration.getContentPane().add(spins, BorderLayout.CENTER);
 		GridBagLayout gbl_spins = new GridBagLayout();
-		gbl_spins.columnWidths = new int[] { 250 };
+		gbl_spins.columnWidths = new int[] { 360 };
 		gbl_spins.rowHeights = new int[] { 100, 100, 100 };
 		gbl_spins.columnWeights = new double[] { 0.0 };
 		gbl_spins.rowWeights = new double[] { 0.0, 0.0, 0.0 };
@@ -210,6 +210,8 @@ public class ConfigurationWindow {
 		toleratedError.add(lblMaxError, gbc_lblMaxError);
 
 		spinMaxError = new JSpinner();
+		spinMaxError.setModel(new SpinnerNumberModel(new Double(0), null, null,
+				new Double(1)));
 		GridBagConstraints gbc_spinMaxError = new GridBagConstraints();
 		gbc_spinMaxError.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinMaxError.insets = new Insets(0, 0, 5, 5);
@@ -225,6 +227,8 @@ public class ConfigurationWindow {
 		toleratedError.add(lblStepError, gbc_lblStepError);
 
 		spinStepError = new JSpinner();
+		spinStepError.setModel(new SpinnerNumberModel(new Double(0), null, null,
+				new Double(1)));
 		GridBagConstraints gbc_spinStepError = new GridBagConstraints();
 		gbc_spinStepError.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinStepError.insets = new Insets(0, 0, 5, 0);
@@ -259,6 +263,8 @@ public class ConfigurationWindow {
 		toleratedAngle.add(lblMinAngle, gbc_lblMinAngle);
 
 		spinMinAngle = new JSpinner();
+		spinMinAngle.setModel(new SpinnerNumberModel(new Double(0), null, null,
+				new Double(1)));
 		GridBagConstraints gbc_spinMinAngle = new GridBagConstraints();
 		gbc_spinMinAngle.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinMinAngle.insets = new Insets(0, 0, 5, 5);
@@ -274,6 +280,8 @@ public class ConfigurationWindow {
 		toleratedAngle.add(lblMaxAngle, gbc_lblMaxAngle);
 
 		spinMaxAngle = new JSpinner();
+		spinMaxAngle.setModel(new SpinnerNumberModel(new Double(0), null, null,
+				new Double(1)));
 		GridBagConstraints gbc_spinMaxAngle = new GridBagConstraints();
 		gbc_spinMaxAngle.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinMaxAngle.insets = new Insets(0, 0, 5, 5);
@@ -289,6 +297,8 @@ public class ConfigurationWindow {
 		toleratedAngle.add(lblStepAngle, gbc_lblStepAngle);
 
 		spinStepAngle = new JSpinner();
+		spinStepAngle.setModel(new SpinnerNumberModel(new Double(0), null, null,
+				new Double(1)));
 		GridBagConstraints gbc_spinStepAngle = new GridBagConstraints();
 		gbc_spinStepAngle.fill = GridBagConstraints.HORIZONTAL;
 		gbc_spinStepAngle.insets = new Insets(0, 0, 5, 0);

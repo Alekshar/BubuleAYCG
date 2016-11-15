@@ -372,19 +372,9 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 			StringBuilder strB = new StringBuilder();
 			String strSave = null;
 
-			/*
-			 * try (BufferedReader br = new BufferedReader(new FileReader(
-			 * "data/README.txt"))) { String strLine;
-			 * 
-			 * while ((strLine = br.readLine()) != null) { strB.append(strLine +
-			 * "\n"); } br.close(); } catch (IOException e1) {
-			 * e1.printStackTrace();
-			 */
-
 			strSave = "Bonjour et bienvenue dans l'Aide !\n\n"
-					+
 
-					"Utilisation :\n"
+					+"Utilisation :\n"
 					+ "\t- S\u00e9lectionnez un fichier .txt gr\u00e2ce au bouton \"Fichier\".\n"
 					+ "\t- Apparition du nom du fichier s\u00e9lectionn\u00e9.\n"
 					+ "\t- Affichez ce fichier gr\u00e2ce au bouton \"Afficher\".\n"
@@ -393,15 +383,15 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 
 					"Informations :\n"
 					+ "\tDes informations concernant vos actions seront affich\u00e9es dans la partie \"Informations\".\n\n"
-					+
 
-					"Affichage :\n"
+					+"Affichage :\n"
 					+ "\tPermet l'affichage du graph une fois analys\u00e9.\n"
 					+ "\tUtilisez le slider sur le c\u00f4t\u00e9 pour Zoomer.\n"
 					+ "\tPour vous d\u00e9placer dans la graph, cliquez dessus puis utilisez les fl\u00e8ches du clavier.\n\n"
-					+
-
-					"Options :\n"
+					
+					+"Options :\n"
+					+ "\tBouton Configuration :\n"
+					+ "\t\tPermet de modifier les param\u00e8tres de l'algo utilis\u00e9 pour l'analyse.\n"
 					+ "\tBouton Trajectoire :\n"
 					+ "\t\tPermet de g\u00e9n\u00e9rer un fichier .txt du r\u00e9sultat des trajectoires trouv\u00e9es.\n"
 					+ "\t\tOuvrir ensuite ce fichier avec un \u00e9diteur de texte autre que le bloc note\n"
@@ -411,18 +401,17 @@ public class IHM extends JFrame implements ActionListener, ChangeListener {
 					+ "\tBouton Effacer :\n"
 					+ "\t\tPermet d'effacer l'affichage du graph.\n"
 					+ "\tBouton Aide :\n"
-					+ "\t\tPermet d'ouvrir une fen\u00eatre d'aide. Ce contenu est disponible \u00e9galement\n"
-					+ "\t\tdans un fichier README.txt.\n"
-					+ "\t\t\t\t\t\t\t\t\t\tBy youyou.";
-			// }
+					+ "\t\tPermet d'ouvrir une fen\u00eatre d'aide. Ce contenu est disponible\n"
+					+ "\t\t \u00e9galement dans un fichier README.txt.\n"
+					+ "\t\t\t\t\t\tBy youyou.";
 
 			JTextArea infos = new JTextArea();
+			infos.setOpaque(false);
 			// Si le fichier README n'est pas trouvable, l'aide va s'afficher
 			// quand meme
 			if (strSave != null)
 				infos.setText(strSave.toString());
-			else
-				infos.setText(strB.toString());
+			
 			infos.setEditable(false);
 			infos.setBackground(null);
 
